@@ -1,12 +1,16 @@
 # NtSeq
 
-Welcome! **NtSeq** is a Nucleotide sequence manipulation and analysis library for Node and the Browser. It's built with the developer (and scientist) in mind with simple, readable methods that are part of the standard molecular biologist's vocabulary.
+Welcome! **NtSeq** is a degenerate Nucleotide sequence manipulation and analysis library for Node and the Browser. It's built with the developer (and scientist) in mind with simple, readable methods that are part of the standard molecular biologist's vocabulary.
 
 Additionally, **NtSeq** comes with a novel, highly optimized exhaustive sequence mapping / comparison tool known as **MatchMap** that allows you to *find all ungapped alignments between two degenerate nucleotide sequences, ordered by the number of matches*. Also provided is a list of results showing the number of each match count, which can be useful for determining if certain sequences or variations are over-represented in a target genome. (P-values, unfortunately, are out of the scope of this project.)
 
-**MatchMap** uses bit operations to exhaustively scan a search sequence at a rate of over 10x faster than a standard naive alignment implementation that uses string comparisons. It can run at a rate of **approximately 500,000,000 nucleotide comparisons per second** on a 2.4GHz processor.
+**MatchMap** uses bit operations to exhaustively scan a search sequence at a rate of up to 10x faster than a standard naive alignment implementation that uses string comparisons. It can run at a rate of up to **approximately 500,000,000 nucleotide comparisons per second** on a 2.4GHz processor.
 
 Tests and benchmarks are included in this repository which can be easily run from the command line using node / npm. :)
+
+New to bioinformatics, or never played with a nucleotide sequence before?
+Check out [Nucleic Acid Notation](http://en.wikipedia.org/wiki/Nucleic_acid_notation)
+to get started.
 
 ## Installation
 
@@ -175,6 +179,273 @@ map.best().alignmentCover().sequence(); // === 'CCCD'
 //             CCCW
 map.matchCount(); // === [ 6, 8, 3, 2, 0 ]
 ```
+
+## Library Reference
+
+### Nt.Seq
+
+#### (constructor) Nt.Seq( [optional String seqType] )
+
+Construct a new Nt.Seq object. `seqType` can be `'DNA'` or `'RNA'`.
+
+```javascript
+var seq = new Nt.Seq();
+```
+
+---
+
+#### Nt.Seq#read( [String sequenceData] )
+
+returns `self`
+
+Reads the sequenceData into the `Nt.Seq` object.
+
+Expects the sequence data to be read 5' -> 3' (left to right).
+
+```javascript
+seq.read('ATGCATGC');
+```
+
+---
+
+#### Nt.Seq#readFASTA( [String fastaData] )
+
+returns `self`
+
+Reads a lone FASTA file into the `Nt.Seq` object, removing comments
+and ignoring line breaks.
+
+---
+
+#### Nt.Seq#size()
+
+returns `Integer`
+
+Returns the size (length in nucleotides) of the sequence.
+
+---
+
+#### Nt.Seq#sequence()
+
+returns `String`
+
+Returns the nucleotide sequence as a string
+
+---
+
+#### Nt.Seq#complement()
+
+returns `Nt.Seq`
+
+Creates a new `Nt.Seq` object with complementary sequence data.
+
+```javascript
+var seq = new Nt.Seq().read('ATGC');
+var complement = seq.complement();
+
+// Will read: 'GCAT'
+complement.sequence();
+```
+
+---
+
+#### Nt.Seq#equivalent( [Nt.Seq compareSequence] )
+
+returns `Boolean`
+
+Tells us whether two sequences are equivalent (same nucleotide data and
+  type, RNA or DNA).
+
+---
+
+#### Nt.Seq#replicate( [optional Integer offset], [optional Integer length] )
+
+returns `Nt.Seq`
+
+Creates a new `Nt.Seq` object, starting at an optional offset and continuing to
+the specified length. If length is unspecified, will continue until the end of
+the sequence.
+
+---
+
+#### Nt.Seq#polymerize( [Nt.Seq sequence] )
+
+returns `Nt.Seq`
+
+Creates a new `Nt.Seq` object that is the result of concatenating the current
+and provided `sequence` together.
+
+---
+
+#### Nt.Seq#insertion( [Nt.Seq insertedSequence], [Integer offset] )
+
+returns `Nt.Seq`
+
+Creates a new `Nt.Seq` object that is the result of inserting `insertedSequence`
+at the specified offset.
+
+---
+
+#### Nt.Seq#deletion( [Nt.Seq offset], [Integer length] )
+
+returns `Nt.Seq`
+
+Creates a new `Nt.Seq` object that is the result of deleting (removing)
+nucleotides from the current sequence beginning at `offset` and continue to
+`length`.
+
+---
+
+#### Nt.Seq#repeat( [Integer count] )
+
+returns `Nt.Seq`
+
+Creates a new `Nt.Seq` object that is the result of repeating the current
+sequence `count` number of times. (0 will return an empty sequence, 1 will
+  return an identical sequence.)
+
+---
+
+#### Nt.Seq#mask( [Nt.Seq sequence] )
+
+returns `Nt.Seq`
+
+Creates a new `Nt.Seq` object that is the result of aligning the current
+  sequence and provided `sequence` and choosing this most pessimistic match
+  between nucleotides. (Provides a sequence containing only exactly matching
+    nucleotides.)
+
+  See [Nucleic Acid Notation](http://en.wikipedia.org/wiki/Nucleic_acid_notation) for more information
+
+```javascript
+var seqA = new Nt.Seq().read('ATGC');
+var seqB = new Nt.Seq().read('AWTS')
+
+var seqC = seqA.mask(seqB);
+seqC.sequence(); // === 'AT-C'
+```
+
+---
+
+#### Nt.Seq#cover( [Nt.Seq sequence] )
+
+returns `Nt.Seq`
+
+Creates a new `Nt.Seq` object that is the result of aligning the current
+  sequence and provided `sequence` and choosing this most optimistic match
+  between nucleotides. (Provides a sequence that will match both.)
+
+  See [Nucleic Acid Notation](http://en.wikipedia.org/wiki/Nucleic_acid_notation) for more information
+
+```javascript
+var seqA = new Nt.Seq().read('ATGC');
+var seqB = new Nt.Seq().read('AWTS')
+
+var seqC = seqA.cover(seqB);
+seqC.sequence(); // === 'AWKS'
+```
+
+---
+
+#### Nt.Seq#content()
+
+returns `Object`
+
+Returns a Object (hash table) containing the frequency counts of nucleotides,
+**including degenerate nucleotides (16 results total)**.
+
+```javascript
+var seqA = new Nt.Seq().read('ATGC');
+
+var content = seqA.content();
+/* Looks like:
+  {
+    'A': 1, 'T': 1, 'G': 1, 'C': 1, 'S': 0, 'W': 0, 'N': 0 [...]
+  }
+*/
+
+var Acontent = content['A']; // === 1
+```
+
+---
+
+#### Nt.Seq#fractionalContent()
+
+returns `Object`
+
+Returns a Object (hash table) containing the fraction of nucleotides present in
+the sequence, **including degenerate nucleotides (16 results total)**.
+
+```javascript
+var seqA = new Nt.Seq().read('ATGC');
+
+var content = seqA.fractionalContent();
+/* Looks like:
+  {
+    'A': 0.25, 'T': 0.25, 'G': 0.25, 'C': 0.25, 'S': 0, 'W': 0, 'N': 0 [...]
+  }
+*/
+
+var Acontent = content['A']; // === 0.25
+```
+
+---
+
+#### Nt.Seq#contentATGC()
+
+returns `Object`
+
+Returns a Object (hash table) containing frequency counts of **only the four
+non-degenerate nucleotides**.
+
+**NOTE:** Degenerate nucleotides are counted as *fractions*
+of A, T, G, or C with this method. (N = 0.25 x A, 0.25 x G, 0.25 x T, 0.25 x C).
+
+```javascript
+var seqA = new Nt.Seq().read('ATNN');
+
+var content = seqA.fractionalContent();
+/* Looks like:
+  {
+    'A': 1.5,
+    'T': 1.5,
+    'G': 0.5,
+    'C': 0.5
+  }
+*/
+
+var Acontent = content['A']; // === 1.5
+```
+
+---
+
+#### Nt.Seq#fractionalContentATGC()
+
+returns `Object`
+
+Returns a Object (hash table) containing the fraction of **only the four
+non-degenerate nucleotides**.
+
+**NOTE:** Degenerate nucleotides are counted as *fractions*
+of A, T, G, or C with this method. (N = 0.25 x A, 0.25 x G, 0.25 x T, 0.25 x C).
+
+```javascript
+var seqA = new Nt.Seq().read('ATNN');
+
+var content = seqA.fractionalContent();
+/* Looks like:
+  {
+    'A': 0.375,
+    'T': 0.375,
+    'G': 0.125,
+    'C': 0.125
+  }
+*/
+
+var Acontent = content['A']; // === 0.375
+```
+
+---
 
 ## Benchmarks and Tests
 
