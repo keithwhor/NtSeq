@@ -1,0 +1,28 @@
+{
+  "name": "ntseq",
+  "version": "1.0.0",
+  "description": "Nucleotide sequence manipulation and analysis tool for Node and the Browser",
+  "main": "lib/nt.js",
+  "scripts": {
+    "test": "node ./tests/test.js",
+    "benchmark": "node ./tests/benchmark.js"
+  },
+  "files": [
+    "lib/",
+  ],
+  "keywords": [
+    "nucleotide",
+    "nucleic",
+    "acid",
+    "dna",
+    "rna",
+    "sequence",
+    "bioinformatics",
+    "biotechnology",
+    "computational",
+    "biology",
+    "analysis"
+  ],
+  "author": "Keith Horwood",
+  "license": "MIT"
+}
