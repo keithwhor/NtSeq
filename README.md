@@ -471,11 +471,7 @@ seq.translate(1, 6); // === 'CP'
 
 ---
 
-#### Nt.Seq#translateFrame(
-####   [optional Integer frame],
-####   [optional Integer AAoffset],
-####   [optional Integer AAlength]
-#### )
+#### Nt.Seq#translateFrame( [optional Integer frame], [optional Integer AAoffset], [optional Integer AAlength] )
 
 returns `String`
 
