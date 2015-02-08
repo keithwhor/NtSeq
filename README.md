@@ -4,7 +4,9 @@ Welcome! **NtSeq** is a Nucleotide sequence manipulation and analysis library fo
 
 Additionally, **NtSeq** comes with a novel, highly optimized exhaustive sequence mapping / comparison tool known as **MatchMap** that allows you to *find all ungapped alignments between two degenerate nucleotide sequences, ordered by the number of matches*. Also provided is a list of results showing the number of each match count, which can be useful for determining if certain sequences or variations are over-represented in a target genome. (P-values, unfortunately, are out of the scope of this project.)
 
-**MatchMap** uses bit operations to exhaustively scan a search sequence at a rate of over 10x faster than a standard naive alignment implementation that uses string comparisons. It can run at a rate of **approximately 500,000,000 nucleotide comparisons per second** on a 2.4GHz processor. Benchmarks are included in this repository which can be easily run from the command line using node / npm. :)
+**MatchMap** uses bit operations to exhaustively scan a search sequence at a rate of over 10x faster than a standard naive alignment implementation that uses string comparisons. It can run at a rate of **approximately 500,000,000 nucleotide comparisons per second** on a 2.4GHz processor.
+
+Tests and benchmarks are included in this repository which can be easily run from the command line using node / npm. :)
 
 ## Installation
 
@@ -81,7 +83,7 @@ seq.read('AATT');
 
 Great, now I can start playing around with it. :)
 
-```
+```javascript
 var repeatedSeq = seq.repeat(3);
 
 // Logs 'AATT'
@@ -172,4 +174,49 @@ map.best().alignmentCover().sequence(); // === 'CCCD'
 //      i.e.     ATGC
 //             CCCW
 map.matchCount(); // === [ 6, 8, 3, 2, 0 ]
+```
+
+## Benchmarks and Tests
+
+NtSeq has a number of integration tests that you can access with
+
+```
+$ npm test
+```
+
+and run benchmarks with
+
+```
+$ npm run benchmark
+```
+
+You should get an output that looks (roughly) like the following (taken
+  Feb 7th, 2015 on a 2.4GHz processor).
+
+**naive** refers to a simple string implementation of exhaustive alignment
+mapping (no heuristics), and **search** refers to the **MatchMap** optimized
+bit up alignment mapping, providing the same result (no heuristics either!).
+
+The scores (lower is better) are calculated by dividing the total execution time
+  in nanoseconds by the input size in (*m* x *n* where *m* is search (large)
+  sequence length and *n* is query sequence length).
+
+The benchmark titles indicate the total size of the search space, and what
+percent identity (similarity) the sequences have to one another.
+
+```
+Benchmark         |        naive |       search |   naiveScore |  searchScore
+--------------------------------------------------------------------------------
+1,000,000, 0%     |          9ms |          3ms |    9.00ns/nt |    3.00ns/nt
+10,000,000, 0%    |         63ms |          5ms |    6.30ns/nt |    0.50ns/nt
+100,000,000, 0%   |        621ms |         60ms |    6.21ns/nt |    0.60ns/nt
+1,000,000, 25%    |         15ms |          6ms |   15.00ns/nt |    6.00ns/nt
+10,000,000, 25%   |        124ms |         17ms |   12.40ns/nt |    1.70ns/nt
+100,000,000, 25%  |       1249ms |        233ms |   12.49ns/nt |    2.33ns/nt
+1,000,000, 50%    |         15ms |          2ms |   15.00ns/nt |    2.00ns/nt
+10,000,000, 50%   |        131ms |         20ms |   13.10ns/nt |    2.00ns/nt
+100,000,000, 50%  |       1305ms |        234ms |   13.05ns/nt |    2.34ns/nt
+1,000,000, 100%   |         14ms |          2ms |   14.00ns/nt |    2.00ns/nt
+10,000,000, 100%  |        144ms |         18ms |   14.40ns/nt |    1.80ns/nt
+100,000,000, 100% |       1471ms |        240ms |   14.71ns/nt |    2.40ns/nt
 ```
