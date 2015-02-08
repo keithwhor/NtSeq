@@ -96,7 +96,7 @@ console.log(seq.sequence());
 console.log(repeatedSeq.sequence());
 
 // Can shorten to one line...
-var gcSeq = new Nt.Seq().read('GCGC');
+var gcSeq = (new Nt.Seq()).read('GCGC');
 
 var insertedSeq = repeatedSeq.insertion(gcSeq, 4);
 
@@ -114,7 +114,7 @@ insertedSeq.polymerize(gcSeq).sequence();
 And we find the reverse complement in a flash!
 
 ```javascript
-var complementMe = new Nt.Seq().read('CCAATT');
+var complementMe = (new Nt.Seq()).read('CCAATT');
 // is 'AATTGG'
 complementMe.complement().sequence();
 ```
@@ -122,7 +122,7 @@ complementMe.complement().sequence();
 Translating sequences to amino acid sequences is trivial...
 
 ```javascript
-var seq = new Nt.Seq().read('ATGCCCGACTGCA');
+var seq = (new Nt.Seq()).read('ATGCCCGACTGCA');
 // Translate at nucleotide offset 0
 seq.translate(); // === 'MPDC'
 // Translate at nucleotide offset 1
@@ -140,17 +140,17 @@ seq.fractionalContent()['A'] // === 0.23076923076923078, about 23%!
 Hmm, well this is a small sequence but I want to find where "CCCG" matches
 
 ```javascript
-var seq = new Nt.Seq().read('ATGCCCGACTGCA');
-var querySeq = new Nt.Seq().read('CCCG');
+var seq = (new Nt.Seq()).read('ATGCCCGACTGCA');
+var querySeq = (new Nt.Seq()).read('CCCG');
 var map = seq.mapSequence(querySeq);
 map.best().position; // === 3
 ```
 
-Hmm, what about degenerate matching, 'ASTG'?
+What about degenerate matching, 'ASTG'?
 
 ```javascript
-var seq = new Nt.Seq().read('ATGCCCGACTGCA');
-var querySeq = new Nt.Seq().read('ASTG');
+var seq = (new Nt.Seq()).read('ATGCCCGACTGCA');
+var querySeq = (new Nt.Seq()).read('ASTG');
 var map = seq.mapSequence(querySeq);
 map.best().position; // === 7
 ```
@@ -158,8 +158,8 @@ map.best().position; // === 7
 What if there are no perfect matches?
 
 ```javascript
-var seq = new Nt.Seq().read('ATGCCCGACTGCA');
-var querySeq = new Nt.Seq().read('CCCW');
+var seq = (new Nt.Seq()).read('ATGCCCGACTGCA');
+var querySeq = (new Nt.Seq()).read('CCCW');
 var map = seq.mapSequence(querySeq);
 map.best().position; // === 3
 map.best().matches; // === 3
@@ -189,7 +189,7 @@ map.matchCount(); // === [ 6, 8, 3, 2, 0 ]
 Construct a new Nt.Seq object. `seqType` can be `'DNA'` or `'RNA'`.
 
 ```javascript
-var seq = new Nt.Seq();
+var seq = (new Nt.Seq());
 ```
 
 ---
@@ -240,7 +240,7 @@ returns `Nt.Seq`
 Creates a new `Nt.Seq` object with complementary sequence data.
 
 ```javascript
-var seq = new Nt.Seq().read('ATGC');
+var seq = (new Nt.Seq()).read('ATGC');
 var complement = seq.complement();
 
 // Will read: 'GCAT'
@@ -318,8 +318,8 @@ Creates a new `Nt.Seq` object that is the result of aligning the current
   See [Nucleic Acid Notation](http://en.wikipedia.org/wiki/Nucleic_acid_notation) for more information
 
 ```javascript
-var seqA = new Nt.Seq().read('ATGC');
-var seqB = new Nt.Seq().read('AWTS')
+var seqA = (new Nt.Seq()).read('ATGC');
+var seqB = (new Nt.Seq()).read('AWTS')
 
 var seqC = seqA.mask(seqB);
 seqC.sequence(); // === 'AT-C'
@@ -338,8 +338,8 @@ Creates a new `Nt.Seq` object that is the result of aligning the current
   See [Nucleic Acid Notation](http://en.wikipedia.org/wiki/Nucleic_acid_notation) for more information
 
 ```javascript
-var seqA = new Nt.Seq().read('ATGC');
-var seqB = new Nt.Seq().read('AWTS')
+var seqA = (new Nt.Seq()).read('ATGC');
+var seqB = (new Nt.Seq()).read('AWTS')
 
 var seqC = seqA.cover(seqB);
 seqC.sequence(); // === 'AWKS'
@@ -355,7 +355,7 @@ Returns a Object (hash table) containing the frequency counts of nucleotides,
 **including degenerate nucleotides (16 results total)**.
 
 ```javascript
-var seqA = new Nt.Seq().read('ATGC');
+var seqA = (new Nt.Seq()).read('ATGC');
 
 var content = seqA.content();
 /* Looks like:
@@ -377,7 +377,7 @@ Returns a Object (hash table) containing the fraction of nucleotides present in
 the sequence, **including degenerate nucleotides (16 results total)**.
 
 ```javascript
-var seqA = new Nt.Seq().read('ATGC');
+var seqA = (new Nt.Seq()).read('ATGC');
 
 var content = seqA.fractionalContent();
 /* Looks like:
@@ -402,7 +402,7 @@ non-degenerate nucleotides**.
 of A, T, G, or C with this method. (N = 0.25 x A, 0.25 x G, 0.25 x T, 0.25 x C).
 
 ```javascript
-var seqA = new Nt.Seq().read('ATNN');
+var seqA = (new Nt.Seq()).read('ATNN');
 
 var content = seqA.fractionalContent();
 /* Looks like:
@@ -430,7 +430,7 @@ non-degenerate nucleotides**.
 of A, T, G, or C with this method. (N = 0.25 x A, 0.25 x G, 0.25 x T, 0.25 x C).
 
 ```javascript
-var seqA = new Nt.Seq().read('ATNN');
+var seqA = (new Nt.Seq()).read('ATNN');
 
 var content = seqA.fractionalContent();
 /* Looks like:
@@ -443,6 +443,305 @@ var content = seqA.fractionalContent();
 */
 
 var Acontent = content['A']; // === 0.375
+```
+
+---
+
+#### Nt.Seq#translate( [optional Integer offset], [optional Integer length] )
+
+returns `String`
+
+Returns a string containing the Amino Acid sequence represented by the nucleotide
+sequence, starting at a nucleotide provided by `offset` and continuing for `length`
+**nucleotides (not amino acids!)**. If `offset` is not provided, the entire
+sequence will be translated. If `length` is not provided, translation will
+continue until the end of the sequence.
+
+See [Amino Acid Abbreviations](http://en.wikipedia.org/wiki/Amino_acid#Table_of_standard_amino_acid_abbreviations_and_properties) for more details.
+
+```javascript
+var seq = (new Nt.Seq()).read('ATGCCCGACTGCA');
+// Translate at nucleotide offset 0
+seq.translate(); // === 'MPDC'
+// Translate at nucleotide offset 1
+seq.translate(1); // === 'CPTA'
+// Translate at nucleotide offset 1, continue for 6 nucleotides (2 AAs)
+seq.translate(1, 6); // === 'CP'
+```
+
+---
+
+#### Nt.Seq#translateFrame(
+####   [optional Integer frame],
+####   [optional Integer AAoffset],
+####   [optional Integer AAlength]
+#### )
+
+returns `String`
+
+Returns a string containing the Amino Acid sequence represented by the current
+nucleotide sequence. Translation can begin at one of three `frame`s (0, 1 or 2)
+and then begin at an Amino Acid specified by `AAoffset` and continuing for `AAlength`
+Amino Acids. If `AAoffset` is not provided, the entire sequence will be translated.
+If `AAlength` is not provided, translation will continue until the end of the sequence.
+
+**NOTE:** Remember the difference! `.translateFrame()` uses **amino acid** offsets,
+while `.translate()` uses **nucleotide** offsets.
+
+See [Amino Acid Abbreviations](http://en.wikipedia.org/wiki/Amino_acid#Table_of_standard_amino_acid_abbreviations_and_properties) for more details.
+
+```javascript
+var seq = (new Nt.Seq()).read('ATGCCCGACTGCA');
+// Translate entire sequence
+seq.translateFrame(); // === 'MPDC'
+// Translate beginning at frame 1 (offset by 1 nt)
+seq.translateFrame(1); // === 'CPTA'
+// Translate from frame 1 (offset by 1 nt), start by offset of 1 amino acid
+//   and continue for 2 amino acids
+seq.translateFrame(1, 1, 2); // === 'PT'
+```
+
+---
+
+#### Nt.Seq#mapSequence( [Nt.Seq querySequence] )
+
+returns `Nt.MatchMap`
+
+Creates a new `Nt.MatchMap` object using the provided `querySequence` as a search
+query in the larger sequence. Equivalent to `new MatchMap(querySequence, currentSequence)`.
+
+See **Nt.MatchMap** for more details.
+
+```javascript
+var seq = (new Nt.Seq()).read('ATGCCCGACTGCA');
+var querySeq = (new Nt.Seq()).read('TGC');
+
+var map = seq.mapSequence(querySeq); // === (new Nt.MatchMap(querySeq, seq))
+
+```
+
+---
+
+#### Nt.Seq#loadFASTA( [String pathname] )
+
+returns `self`
+
+**NODE ONLY**
+
+Will load sequence data from a FASTA file located at the provided `pathname`
+
+---
+
+#### Nt.Seq#load4bnt( [String pathname] )
+
+returns `self`
+
+**NODE ONLY**
+
+Will load sequence data from a `.4bnt` file located at the provided `pathname`
+
+(`.4bnt` is short for "4-bit nucleotide")
+
+---
+
+#### Nt.Seq#save4bnt( [optional String name], [optional String path] )
+
+returns `self`
+
+**NODE ONLY**
+
+Will save sequence data as `name.4bnt` in a directory located at `path`.
+
+If `name` is not provided, it will be automatically generated as `sequence_TIME.4bnt`
+where `TIME` is the current UNIX timestamp in milliseconds.
+
+If `path` is not provided, the directory you're running the process from will be
+used.
+
+(`.4bnt` is short for "4-bit nucleotide")
+
+---
+
+### Nt.MatchMap
+
+#### (constructor) Nt.Matchmap( [Nt.Seq querySeq], [Nt.Seq searchSeq] )
+
+Construct a new `Nt.MatchMap` object that queries `searchSeq` for matches of
+`querySeq`. Performs exhaustive degenerate nucleotide matching at every
+combination of nucleotides and stores the results. Results are ordered by alignment
+of position 0 of `querySeq` with a position in `searchSeq` (starting with negative offsets).
+
+```javascript
+var seq = (new Nt.Seq()).read('ATGCCCGACTGCA');
+var querySeq = (new Nt.Seq()).read('TGC');
+
+var map = new Nt.MatchMap(querySeq, seq); // === seq.mapSequence(querySeq);
+```
+
+---
+
+#### Nt.MatchMap#results( [optional Integer offset], [optional Integer count] )
+
+returns `Array (of Object)`
+
+Provides results in an array, ordered from the leftmost offset (negative alignment
+  of `querySeq` relative to `searchSeq`) as element 0.
+
+Objects returned will be hashes containing the following:
+
+```javascript
+{
+  position: [Integer],
+  matches: [Integer]
+}
+```
+
+Will `Array#slice` on the result array depending on `offset` and `count`.
+(Returns subset of the Array).
+
+---
+
+#### Nt.MatchMap#best()
+
+returns `Nt.MatchResult`
+
+Provides the best possible alignment match of `querySeq` in `searchSeq` as
+a new `Nt.MatchResult` object. See **Nt.MatchResult** for more details.
+
+**NOTE:** There is no guarantee that the sorted results based on matches will be
+stable, do not write code that expects this to always be identical given ties
+of top match counts.
+
+---
+
+#### Nt.MatchMap#top( [Integer count] )
+
+returns `Array (of Nt.MatchResult)`
+
+Provides an Array containing the **best** possible alignment matches of `querySeq`
+in `searchSeq` as new `Nt.MatchResult` objects. See **Nt.MatchResult** for more
+details.
+
+**NOTE:** There is no guarantee that the sorted results based on matches will be
+stable, do not write code that expects this to always be identical given ties
+of top match counts.
+
+```javascript
+var seq = (new Nt.Seq()).read('ATGCCCGACTGCA');
+var querySeq = (new Nt.Seq()).read('TGC');
+
+var map = new Nt.MatchMap(querySeq, seq);
+var topArray = map.top(2); // === [ Nt.MatchResult, Nt.MatchResult ]
+```
+
+---
+
+#### Nt.MatchMap#bottom( [Integer count] )
+
+returns `Array (of Nt.MatchResult)`
+
+Provides an Array containing the **worst** possible alignment matches of `querySeq`
+in `searchSeq` as new `Nt.MatchResult` objects. See **Nt.MatchResult** for more
+details.
+
+**NOTE:** There is no guarantee that the sorted results based on matches will be
+stable, do not write code that expects this to always be identical given ties
+of bottom match counts.
+
+---
+
+#### Nt.MatchMap#matchCount()
+
+returns `Array (of Integers)`
+
+Provides an Array containing the frequency distribution of all matches.
+The Array will be the same length as `querySequence.size()`, the *0*-indexed
+element represents the number of times **no (0)** matches were found considering
+all possible alignments,  and the *n*-indexed element represents the number of
+times **n** matches were found considering all possible alignments.
+
+
+---
+
+### Nt.MatchResult
+
+#### INACCESSIBLE (constructor) Nt.MatchResult
+
+Create `Nt.MatchResult` using the `Nt.MatchMap#best`, `Nt.MatchMap#top` and
+`Nt.MatchMap#bottom` methods.
+
+#### Properties
+
+##### .position
+
+  The alignment position of this MatchResult in `searchSequence` of your
+  `Nt.MatchMap`.
+
+##### .matches
+
+  The number of matches between `querySequence` and `searchSequence` at this
+  alignment position.
+
+---
+
+#### Nt.MatchResult#alignment()
+
+returns `Nt.Seq`
+
+Creates a new `Nt.Seq` instance representing the portion of your `searchSequence`
+aligned at the associated `Nt.MatchResult` position. Will be `querySequence.size()`
+nucleotides long.
+
+```javascript
+var seq = (new Nt.Seq()).read('ATGCCCGACTGCA');
+var querySeq = (new Nt.Seq()).read('TGCTC');
+
+var map = new Nt.MatchMap(querySeq, seq);
+var bestMatch = map.best();
+
+bestMatch.alignment().sequence(); // === 'TGCCC'
+```
+
+---
+
+#### Nt.MatchResult#alignmentMask()
+
+returns `Nt.Seq`
+
+Creates a new `Nt.Seq` instance representing a `Nt.Seq#mask()` of the portion of your `searchSequence` aligned at the associated `Nt.MatchResult` position.
+Will be `querySequence.size()` nucleotides long.
+
+See **Nt.Seq#mask** for more information.
+
+```javascript
+var seq = (new Nt.Seq()).read('ATGCCCGACTGCA');
+var querySeq = (new Nt.Seq()).read('TGCTC');
+
+var map = new Nt.MatchMap(querySeq, seq);
+var bestMatch = map.best();
+
+bestMatch.alignmentMask().sequence(); // === 'TGC-C'
+```
+
+---
+
+#### Nt.MatchResult#alignmentCover()
+
+returns `Nt.Seq`
+
+Creates a new `Nt.Seq` instance representing a `Nt.Seq#cover()` of the portion of your `searchSequence` aligned at the associated `Nt.MatchResult` position.
+Will be `querySequence.size()` nucleotides long.
+
+See **Nt.Seq#cover** for more information.
+
+```javascript
+var seq = (new Nt.Seq()).read('ATGCCCGACTGCA');
+var querySeq = (new Nt.Seq()).read('TGCTC');
+
+var map = new Nt.MatchMap(querySeq, seq);
+var bestMatch = map.best();
+
+bestMatch.alignmentCover().sequence(); // === 'TGCYC'
 ```
 
 ---
