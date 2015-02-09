@@ -25,7 +25,8 @@
     "biotechnology",
     "computational",
     "biology",
-    "analysis"
+    "analysis",
+    "biojs"
   ],
   "repository": {
     "type": "git",
