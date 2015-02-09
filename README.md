@@ -1,11 +1,18 @@
 # NtSeq
 
-**NtSeq** is a DNA sequence manipulation and analysis library for Node and the Browser.
+**NtSeq** is an open source Bionformatics library written in JavaScript
+that provides DNA sequence manipulation and analysis tools for node and the
+browser.
 
 More specifically, it's a library for dealing with all kinds of nucleotide sequences,
-including *degenerate nucleotides*. It's built with the developer (and scientist) in mind with simple, readable methods that are part of the standard molecular biologist's vocabulary.
+including *degenerate nucleotides*. It's built with the developer (and scientist)
+in mind with simple, readable methods that are part of the standard molecular
+biologist's vocabulary.
 
-Additionally, **NtSeq** comes with a novel, highly optimized exhaustive sequence mapping / comparison tool known as **Nt.MatchMap**.
+## Sequence Alignment / Mapping
+
+Additionally, **NtSeq** comes with a novel, highly optimized exhaustive sequence
+mapping / comparison tool known as **Nt.MatchMap**.
 
 **Nt.MatchMap** allows you to *find all ungapped alignments between two degenerate nucleotide sequences, ordered by the number of matches*. Also provided is a list of results showing the number of each match count, which can be useful for determining if certain sequences or variations are over-represented in a target genome. (P-values, unfortunately, are out of the scope of this project.)
 
@@ -51,6 +58,9 @@ You can use NtSeq in your node project by using:
 ```javascript
 var Nt = require('ntseq');
 ```
+
+(The [node.js version](https://www.npmjs.com/package/ntseq) has some useful
+additional tools.)
 
 In order to use NtSeq on a webpage, download `ntseq.js` from this repository and include it in a script tag, like so (assuming it is in the same directory as your page):
 

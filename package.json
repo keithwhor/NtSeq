@@ -1,7 +1,7 @@
 {
   "name": "ntseq",
-  "version": "1.0.3",
-  "description": "Nucleotide sequence manipulation and analysis library for Node and the Browser",
+  "version": "1.0.4",
+  "description": "Nucleotide sequence manipulation and analysis library",
   "author": "Keith Horwood",
   "license": "MIT",
   "main": "lib/nt.js",
