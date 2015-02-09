@@ -869,7 +869,9 @@ probability mass function in JavaScript as follows:
 
 **p** is the probability of a match between two randomly selected nucleotides
   (calculated above).
+
 **n** is the number of trials (the length of your query sequence)
+
 **k** should be your number of matches.
 
 ```javascript
@@ -968,8 +970,8 @@ You can feel free to follow me on Twitter:
 
 Check out my other projects on GitHub:
 
-http://github.com/keithwhor
+[github.com/keithwhor](http://github.com/keithwhor)
 
 Or check out my personal website:
 
-http://keithwhor.com
+[keithwhor.com](http://keithwhor.com)
