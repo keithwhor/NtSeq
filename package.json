@@ -1,6 +1,6 @@
 {
   "name": "ntseq",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Nucleotide sequence manipulation and analysis library",
   "author": "Keith Horwood",
   "license": "MIT",

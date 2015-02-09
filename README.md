@@ -858,7 +858,7 @@ sequences by just calculating a sum of probabilities:
 
 Where `Pr(SeqA, 'A')` would be the fractional A content of SeqA. (The
 probability of randomly choosing an 'A' nucleotide in SeqA). (This is available
-from `Nt.MatchMap#fractionalContentATGC`).
+from `Nt.Seq#fractionalContentATGC`).
 
 You can then calculate the probability of getting exactly *k* matches on any
 one alignment (say 15 of 20 for a length-20 query sequence) using the
