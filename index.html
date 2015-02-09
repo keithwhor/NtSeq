@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>NtSeq by keithwhor</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>NtSeq</h1>
+        <h2>JavaScript bioinformatics library for nucleotide sequence manipulation and analysis.</h2>
+        <a href="https://github.com/keithwhor/NtSeq" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a id="ntseq" class="anchor" href="#ntseq" aria-hidden="true"><span class="octicon octicon-link"></span></a>NtSeq</h1>
+
+<p><strong>NtSeq</strong> is an open source Bioinformatics library written in JavaScript
+that provides DNA sequence manipulation and analysis tools for node and the
+browser.</p>
+
+<p>More specifically, it's a library for dealing with all kinds of nucleotide sequences,
+including <em>degenerate nucleotides</em>. It's built with the developer (and scientist)
+in mind with simple, readable methods that are part of the standard molecular
+biologist's vocabulary.</p>
+
+<h2>
+<a id="sequence-alignment--mapping" class="anchor" href="#sequence-alignment--mapping" aria-hidden="true"><span class="octicon octicon-link"></span></a>Sequence Alignment / Mapping</h2>
+
+<p>Additionally, <strong>NtSeq</strong> comes with a novel, highly optimized exhaustive sequence
+mapping / comparison tool known as <strong>Nt.MatchMap</strong>.</p>
+
+<p><strong>Nt.MatchMap</strong> allows you to <em>find all ungapped alignments between two degenerate nucleotide sequences, ordered by the number of matches</em>. Also provided is a list of results showing the number of each match count, which can be useful for determining if certain sequences or variations are over-represented in a target genome. (P-values, unfortunately, are out of the scope of this project.)</p>
+
+<p><strong>MatchMap</strong> uses bit operations to exhaustively scan a search sequence at a rate of up to 10x faster than a standard naive alignment implementation that uses string comparisons. It can run at a rate of up to <strong>approximately 500,000,000 nucleotide comparisons per second</strong> single-threaded on a 2.4GHz processor.</p>
+
+<p>An explanation of the algorithm used will be made available shortly. In the meantime, the code
+is open source and MIT-licensed so feel free to figure it out!</p>
+
+<p>Tests and benchmarks are included in this repository which can be easily run from the command line using node / npm. A sample benchmark is also included in this README. :)</p>
+
+<p>New to bioinformatics, or never played with a nucleotide sequence before?
+Check out <a href="http://en.wikipedia.org/wiki/Nucleic_acid_notation">Nucleic Acid Notation</a>
+to get started.</p>
+
+<h2>
+<a id="what-can-i-do-with-ntseq" class="anchor" href="#what-can-i-do-with-ntseq" aria-hidden="true"><span class="octicon octicon-link"></span></a>What can I do with NtSeq?</h2>
+
+<ul>
+<li><p>Quickly scan genomic data for target sequences or ungapped relatives using <code>.mapSequence()</code></p></li>
+<li><p>Grab the 5' -&gt; 3' complement of a sequence with <code>.complement()</code></p></li>
+<li><p>Manipulate sequences easily using <code>.replicate()</code>, <code>.deletion()</code>, <code>.insertion()</code>, <code>.repeat()</code> and <code>.polymerize()</code></p></li>
+<li><p>Translate your nucleotide sequences in a single line of code using <code>.translate()</code> or <code>.translateFrame()</code></p></li>
+<li><p>Quickly determine AT% content with <code>.content()</code> or <code>.fractionalContent()</code></p></li>
+<li><p>Grab <em>approximate</em> AT% content for degenerate sequences using <code>.contentATGC()</code> or <code>.fractionalContentATGC()</code></p></li>
+<li><p>Load FASTA files into memory from your machine (node) with <code>.loadFASTA()</code> or from a string if you use an external AJAX request (web) using <code>.readFASTA()</code></p></li>
+<li><p>Save large sequences for easy accession in the future using a new filetype, <code>.4bnt</code> that will cut your FASTA file sizes in half with <code>.save4bnt()</code> and <code>.load4bnt()</code> (<strong>node only</strong>)</p></li>
+</ul>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p><strong>NtSeq</strong> is available as a node package, and can be installed with:</p>
+
+<pre><code>$ npm install ntseq
+</code></pre>
+
+<p>You can use NtSeq in your node project by using:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> Nt <span class="pl-k">=</span> <span class="pl-s3">require</span>(<span class="pl-s1"><span class="pl-pds">'</span>ntseq<span class="pl-pds">'</span></span>);</pre></div>
+
+<p>(The <a href="https://www.npmjs.com/package/ntseq">node.js version</a> has some useful
+additional tools.)</p>
+
+<p>In order to use NtSeq on a webpage, download <code>ntseq.js</code> from this repository and include it in a script tag, like so (assuming it is in the same directory as your page):</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-k">&lt;</span>script src<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>ntseq.js<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>/script<span class="pl-k">&gt;</span></pre></div>
+
+<p>The <code>Nt</code> namespace contains two constructor methods, <code>Nt.Seq</code> and <code>Nt.MatchMap</code>. You can use these by calling:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-c">// Create and put data into a new nucleotide sequence</span>
+<span class="pl-s">var</span> seqA <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>();
+seqA.read(<span class="pl-s1"><span class="pl-pds">'</span>ATGC<span class="pl-pds">'</span></span>);
+
+<span class="pl-c">// Create an RNA sequence - identical to DNA, but RNA will output 'U' instead of 'T'</span>
+<span class="pl-s">var</span> seqB <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>(<span class="pl-s1"><span class="pl-pds">'</span>RNA<span class="pl-pds">'</span></span>);
+seqB.read(<span class="pl-s1"><span class="pl-pds">'</span>ATGCATGC<span class="pl-pds">'</span></span>);
+
+<span class="pl-c">// Create a MatchMap of seqA aligned against seqB.</span>
+<span class="pl-s">var</span> map <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Nt.MatchMap</span>(seqA, seqB);
+
+<span class="pl-c">// Additionally, this line is equivalent to the previous</span>
+<span class="pl-s">var</span> map <span class="pl-k">=</span> seqB.mapSequence(seqA);</pre></div>
+
+<h2>
+<a id="examples" class="anchor" href="#examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples</h2>
+
+<p>Let's start with a simple sequence...</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> seq <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>();
+seq.read(<span class="pl-s1"><span class="pl-pds">'</span>AATT<span class="pl-pds">'</span></span>);</pre></div>
+
+<p>Great, now I can start playing around with it. :)</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> repeatedSeq <span class="pl-k">=</span> seq.repeat(<span class="pl-c1">3</span>);
+
+<span class="pl-c">// Logs 'AATT'</span>
+<span class="pl-en">console</span><span class="pl-s3">.log</span>(seq.sequence());
+<span class="pl-c">// Logs 'AATTAATTAATT'</span>
+<span class="pl-en">console</span><span class="pl-s3">.log</span>(repeatedSeq.sequence());
+
+<span class="pl-c">// Can shorten to one line...</span>
+<span class="pl-s">var</span> gcSeq <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>GCGC<span class="pl-pds">'</span></span>);
+
+<span class="pl-s">var</span> insertedSeq <span class="pl-k">=</span> repeatedSeq.insertion(gcSeq, <span class="pl-c1">4</span>);
+
+<span class="pl-c">// Logs 'AATTGCGCAATTAATT'</span>
+<span class="pl-en">console</span><span class="pl-s3">.log</span>(insertedSeq.sequence());</pre></div>
+
+<p>We can combine sequences together...</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-c">// is 'AATTGCGCAATTAATTGCGC'</span>
+insertedSeq.polymerize(gcSeq).sequence();</pre></div>
+
+<p>And we find the reverse complement in a flash!</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> complementMe <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>CCAATT<span class="pl-pds">'</span></span>);
+<span class="pl-c">// is 'AATTGG'</span>
+complementMe.complement().sequence();</pre></div>
+
+<p>Translating sequences to amino acid sequences is trivial...</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> seq <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>ATGCCCGACTGCA<span class="pl-pds">'</span></span>);
+<span class="pl-c">// Translate at nucleotide offset 0</span>
+seq.translate(); <span class="pl-c">// === 'MPDC'</span>
+<span class="pl-c">// Translate at nucleotide offset 1</span>
+seq.translate(<span class="pl-c1">1</span>); <span class="pl-c">// === 'CPTA'</span>
+<span class="pl-c">// Translate at nucleotide offset 0, 1 amino acid into the frame</span>
+seq.translateFrame(<span class="pl-c1">0</span>, <span class="pl-c1">1</span>); <span class="pl-c">// === 'PDC'</span></pre></div>
+
+<p>Determine the AT% Content of my sequence... what fraction is A?</p>
+
+<div class="highlight highlight-javascript"><pre>seq.fractionalContent()[<span class="pl-s1"><span class="pl-pds">'</span>A<span class="pl-pds">'</span></span>] <span class="pl-c">// === 0.23076923076923078, about 23%!</span></pre></div>
+
+<p>Hmm, well this is a small sequence but I want to find where "CCCG" matches</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> seq <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>ATGCCCGACTGCA<span class="pl-pds">'</span></span>);
+<span class="pl-s">var</span> querySeq <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>CCCG<span class="pl-pds">'</span></span>);
+<span class="pl-s">var</span> map <span class="pl-k">=</span> seq.mapSequence(querySeq);
+map.best().position; <span class="pl-c">// === 3</span></pre></div>
+
+<p>What about degenerate matching, 'ASTG'?</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> seq <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>ATGCCCGACTGCA<span class="pl-pds">'</span></span>);
+<span class="pl-s">var</span> querySeq <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>ASTG<span class="pl-pds">'</span></span>);
+<span class="pl-s">var</span> map <span class="pl-k">=</span> seq.mapSequence(querySeq);
+map.best().position; <span class="pl-c">// === 7</span></pre></div>
+
+<p>What if there are no perfect matches?</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> seq <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>ATGCCCGACTGCA<span class="pl-pds">'</span></span>);
+<span class="pl-s">var</span> querySeq <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>CCCW<span class="pl-pds">'</span></span>);
+<span class="pl-s">var</span> map <span class="pl-k">=</span> seq.mapSequence(querySeq);
+map.best().position; <span class="pl-c">// === 3</span>
+map.best().matches; <span class="pl-c">// === 3</span>
+map.best().alignment().sequence(); <span class="pl-c">// === 'CCCG'</span>
+
+<span class="pl-c">// this is the actual nucleotides that match, gaps for non-matches</span>
+map.best().alignmentMask().sequence(); <span class="pl-c">// === 'CCC-'</span>
+
+<span class="pl-c">// this is the optimistic sequence that could match both</span>
+map.best().alignmentCover().sequence(); <span class="pl-c">// === 'CCCD'</span>
+
+<span class="pl-c">// .matchFrequencyData provides the number of times a certain number of matches were</span>
+<span class="pl-c">//    found. In this example, the sequence didn't find any matches at 6</span>
+<span class="pl-c">//    locations. Keep in mind the sequence attempts to align outside of the</span>
+<span class="pl-c">//    upper and lower bounds of the search space.</span>
+<span class="pl-c">//      i.e.     ATGC</span>
+<span class="pl-c">//             CCCW</span>
+map.matchFrequencyData(); <span class="pl-c">// === [ 6, 8, 3, 2, 0 ]</span></pre></div>
+
+<h2>
+<a id="benchmarks-and-tests" class="anchor" href="#benchmarks-and-tests" aria-hidden="true"><span class="octicon octicon-link"></span></a>Benchmarks and Tests</h2>
+
+<p>NtSeq has a number of integration tests that you can access (after cloning the
+  repository).</p>
+
+<p>Run tests with</p>
+
+<pre><code>$ npm test
+</code></pre>
+
+<p>And run benchmarks with</p>
+
+<pre><code>$ npm run benchmark
+</code></pre>
+
+<p>You should get an output that looks (roughly) like the following (taken
+  Feb 7th, 2015 on a 2.4GHz processor).</p>
+
+<pre><code>Benchmark         |        naive |       search |   naiveScore |  searchScore
+--------------------------------------------------------------------------------
+1,000,000, 0%     |          9ms |          3ms |    9.00ns/nt |    3.00ns/nt
+10,000,000, 0%    |         63ms |          5ms |    6.30ns/nt |    0.50ns/nt
+100,000,000, 0%   |        621ms |         60ms |    6.21ns/nt |    0.60ns/nt
+1,000,000, 25%    |         15ms |          6ms |   15.00ns/nt |    6.00ns/nt
+10,000,000, 25%   |        124ms |         17ms |   12.40ns/nt |    1.70ns/nt
+100,000,000, 25%  |       1249ms |        233ms |   12.49ns/nt |    2.33ns/nt
+1,000,000, 50%    |         15ms |          2ms |   15.00ns/nt |    2.00ns/nt
+10,000,000, 50%   |        131ms |         20ms |   13.10ns/nt |    2.00ns/nt
+100,000,000, 50%  |       1305ms |        234ms |   13.05ns/nt |    2.34ns/nt
+1,000,000, 100%   |         14ms |          2ms |   14.00ns/nt |    2.00ns/nt
+10,000,000, 100%  |        144ms |         18ms |   14.40ns/nt |    1.80ns/nt
+100,000,000, 100% |       1471ms |        240ms |   14.71ns/nt |    2.40ns/nt
+</code></pre>
+
+<p><strong>naive</strong> refers to a simple string implementation of exhaustive alignment
+mapping (no heuristics), and <strong>search</strong> refers to the <strong>MatchMap</strong> optimized
+bit op alignment mapping, providing the same result (no heuristics either!).</p>
+
+<p>The scores (lower is better) are calculated by dividing the total execution time
+  in nanoseconds by the input size in (<em>m</em> x <em>n</em> where <em>m</em> is search (large)
+  sequence length and <em>n</em> is query sequence length).</p>
+
+<p>The benchmark titles indicate the total size of the search space, and what
+percent identity (similarity) the sequences have to one another.</p>
+
+<h1>
+<a id="library-reference" class="anchor" href="#library-reference" aria-hidden="true"><span class="octicon octicon-link"></span></a>Library Reference</h1>
+
+<h3>
+<a id="ntseq-1" class="anchor" href="#ntseq-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.Seq</h3>
+
+<h4>
+<a id="constructor-ntseq-optional-string-seqtype-" class="anchor" href="#constructor-ntseq-optional-string-seqtype-" aria-hidden="true"><span class="octicon octicon-link"></span></a>(constructor) Nt.Seq( [optional String seqType] )</h4>
+
+<p>Construct a new Nt.Seq object. <code>seqType</code> can be <code>'DNA'</code> or <code>'RNA'</code>.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> seq <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>());</pre></div>
+
+<hr>
+
+<h4>
+<a id="ntseqread-string-sequencedata-" class="anchor" href="#ntseqread-string-sequencedata-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.Seq#read( [String sequenceData] )</h4>
+
+<p>returns <code>self</code></p>
+
+<p>Reads the sequenceData into the <code>Nt.Seq</code> object.</p>
+
+<p>Expects the sequence data to be read 5' -&gt; 3' (left to right).</p>
+
+<div class="highlight highlight-javascript"><pre>seq.read(<span class="pl-s1"><span class="pl-pds">'</span>ATGCATGC<span class="pl-pds">'</span></span>);</pre></div>
+
+<hr>
+
+<h4>
+<a id="ntseqreadfasta-string-fastadata-" class="anchor" href="#ntseqreadfasta-string-fastadata-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.Seq#readFASTA( [String fastaData] )</h4>
+
+<p>returns <code>self</code></p>
+
+<p>Reads a lone FASTA file into the <code>Nt.Seq</code> object, removing comments
+and ignoring line breaks.</p>
+
+<hr>
+
+<h4>
+<a id="ntseqsize" class="anchor" href="#ntseqsize" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.Seq#size()</h4>
+
+<p>returns <code>Integer</code></p>
+
+<p>Returns the size (length in nucleotides) of the sequence.</p>
+
+<hr>
+
+<h4>
+<a id="ntseqsequence" class="anchor" href="#ntseqsequence" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.Seq#sequence()</h4>
+
+<p>returns <code>String</code></p>
+
+<p>Returns the nucleotide sequence as a string</p>
+
+<hr>
+
+<h4>
+<a id="ntseqcomplement" class="anchor" href="#ntseqcomplement" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.Seq#complement()</h4>
+
+<p>returns <code>Nt.Seq</code></p>
+
+<p>Creates a new <code>Nt.Seq</code> object with complementary sequence data.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> seq <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>ATGC<span class="pl-pds">'</span></span>);
+<span class="pl-s">var</span> complement <span class="pl-k">=</span> seq.complement();
+
+<span class="pl-c">// Will read: 'GCAT'</span>
+complement.sequence();</pre></div>
+
+<hr>
+
+<h4>
+<a id="ntseqequivalent-ntseq-comparesequence-" class="anchor" href="#ntseqequivalent-ntseq-comparesequence-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.Seq#equivalent( [Nt.Seq compareSequence] )</h4>
+
+<p>returns <code>Boolean</code></p>
+
+<p>Tells us whether two sequences are equivalent (same nucleotide data and
+  type, RNA or DNA).</p>
+
+<hr>
+
+<h4>
+<a id="ntseqreplicate-optional-integer-offset-optional-integer-length-" class="anchor" href="#ntseqreplicate-optional-integer-offset-optional-integer-length-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.Seq#replicate( [optional Integer offset], [optional Integer length] )</h4>
+
+<p>returns <code>Nt.Seq</code></p>
+
+<p>Creates a new <code>Nt.Seq</code> object, starting at an optional offset and continuing to
+the specified length. If length is unspecified, will continue until the end of
+the sequence.</p>
+
+<hr>
+
+<h4>
+<a id="ntseqpolymerize-ntseq-sequence-" class="anchor" href="#ntseqpolymerize-ntseq-sequence-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.Seq#polymerize( [Nt.Seq sequence] )</h4>
+
+<p>returns <code>Nt.Seq</code></p>
+
+<p>Creates a new <code>Nt.Seq</code> object that is the result of concatenating the current
+and provided <code>sequence</code> together.</p>
+
+<hr>
+
+<h4>
+<a id="ntseqinsertion-ntseq-insertedsequence-integer-offset-" class="anchor" href="#ntseqinsertion-ntseq-insertedsequence-integer-offset-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.Seq#insertion( [Nt.Seq insertedSequence], [Integer offset] )</h4>
+
+<p>returns <code>Nt.Seq</code></p>
+
+<p>Creates a new <code>Nt.Seq</code> object that is the result of inserting <code>insertedSequence</code>
+at the specified offset.</p>
+
+<hr>
+
+<h4>
+<a id="ntseqdeletion-ntseq-offset-integer-length-" class="anchor" href="#ntseqdeletion-ntseq-offset-integer-length-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.Seq#deletion( [Nt.Seq offset], [Integer length] )</h4>
+
+<p>returns <code>Nt.Seq</code></p>
+
+<p>Creates a new <code>Nt.Seq</code> object that is the result of deleting (removing)
+nucleotides from the current sequence beginning at <code>offset</code> and continue to
+<code>length</code>.</p>
+
+<hr>
+
+<h4>
+<a id="ntseqrepeat-integer-count-" class="anchor" href="#ntseqrepeat-integer-count-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.Seq#repeat( [Integer count] )</h4>
+
+<p>returns <code>Nt.Seq</code></p>
+
+<p>Creates a new <code>Nt.Seq</code> object that is the result of repeating the current
+sequence <code>count</code> number of times. (0 will return an empty sequence, 1 will
+  return an identical sequence.)</p>
+
+<hr>
+
+<h4>
+<a id="ntseqmask-ntseq-sequence-" class="anchor" href="#ntseqmask-ntseq-sequence-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.Seq#mask( [Nt.Seq sequence] )</h4>
+
+<p>returns <code>Nt.Seq</code></p>
+
+<p>Creates a new <code>Nt.Seq</code> object that is the result of aligning the current
+  sequence and provided <code>sequence</code> and choosing this most pessimistic match
+  between nucleotides. (Provides a sequence containing only exactly matching
+    nucleotides.)</p>
+
+<p>See <a href="http://en.wikipedia.org/wiki/Nucleic_acid_notation">Nucleic Acid Notation</a> for more information</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> seqA <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>ATGC<span class="pl-pds">'</span></span>);
+<span class="pl-s">var</span> seqB <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>AWTS<span class="pl-pds">'</span></span>)
+
+<span class="pl-s">var</span> seqC <span class="pl-k">=</span> seqA.mask(seqB);
+seqC.sequence(); <span class="pl-c">// === 'AT-C'</span></pre></div>
+
+<hr>
+
+<h4>
+<a id="ntseqcover-ntseq-sequence-" class="anchor" href="#ntseqcover-ntseq-sequence-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.Seq#cover( [Nt.Seq sequence] )</h4>
+
+<p>returns <code>Nt.Seq</code></p>
+
+<p>Creates a new <code>Nt.Seq</code> object that is the result of aligning the current
+  sequence and provided <code>sequence</code> and choosing this most optimistic match
+  between nucleotides. (Provides a sequence that will match both.)</p>
+
+<p>See <a href="http://en.wikipedia.org/wiki/Nucleic_acid_notation">Nucleic Acid Notation</a> for more information</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> seqA <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>ATGC<span class="pl-pds">'</span></span>);
+<span class="pl-s">var</span> seqB <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>AWTS<span class="pl-pds">'</span></span>)
+
+<span class="pl-s">var</span> seqC <span class="pl-k">=</span> seqA.cover(seqB);
+seqC.sequence(); <span class="pl-c">// === 'AWKS'</span></pre></div>
+
+<hr>
+
+<h4>
+<a id="ntseqcontent" class="anchor" href="#ntseqcontent" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.Seq#content()</h4>
+
+<p>returns <code>Object</code></p>
+
+<p>Returns a Object (hash table) containing the frequency counts of nucleotides,
+<strong>including degenerate nucleotides (16 results total)</strong>.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> seqA <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>ATGC<span class="pl-pds">'</span></span>);
+
+<span class="pl-s">var</span> content <span class="pl-k">=</span> seqA.<span class="pl-sc">content</span>();
+<span class="pl-c">/* Looks like:</span>
+<span class="pl-c">  {</span>
+<span class="pl-c">    'A': 1, 'T': 1, 'G': 1, 'C': 1, 'S': 0, 'W': 0, 'N': 0 [...]</span>
+<span class="pl-c">  }</span>
+<span class="pl-c">*/</span>
+
+<span class="pl-s">var</span> Acontent <span class="pl-k">=</span> content[<span class="pl-s1"><span class="pl-pds">'</span>A<span class="pl-pds">'</span></span>]; <span class="pl-c">// === 1</span></pre></div>
+
+<hr>
+
+<h4>
+<a id="ntseqfractionalcontent" class="anchor" href="#ntseqfractionalcontent" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.Seq#fractionalContent()</h4>
+
+<p>returns <code>Object</code></p>
+
+<p>Returns a Object (hash table) containing the fraction of nucleotides present in
+the sequence, <strong>including degenerate nucleotides (16 results total)</strong>.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> seqA <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>ATGC<span class="pl-pds">'</span></span>);
+
+<span class="pl-s">var</span> content <span class="pl-k">=</span> seqA.fractionalContent();
+<span class="pl-c">/* Looks like:</span>
+<span class="pl-c">  {</span>
+<span class="pl-c">    'A': 0.25, 'T': 0.25, 'G': 0.25, 'C': 0.25, 'S': 0, 'W': 0, 'N': 0 [...]</span>
+<span class="pl-c">  }</span>
+<span class="pl-c">*/</span>
+
+<span class="pl-s">var</span> Acontent <span class="pl-k">=</span> content[<span class="pl-s1"><span class="pl-pds">'</span>A<span class="pl-pds">'</span></span>]; <span class="pl-c">// === 0.25</span></pre></div>
+
+<hr>
+
+<h4>
+<a id="ntseqcontentatgc" class="anchor" href="#ntseqcontentatgc" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.Seq#contentATGC()</h4>
+
+<p>returns <code>Object</code></p>
+
+<p>Returns a Object (hash table) containing frequency counts of <strong>only the four
+non-degenerate nucleotides</strong>.</p>
+
+<p><strong>NOTE:</strong> Degenerate nucleotides are counted as <em>fractions</em>
+of A, T, G, or C with this method. (N = 0.25 x A, 0.25 x G, 0.25 x T, 0.25 x C).</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> seqA <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>ATNN<span class="pl-pds">'</span></span>);
+
+<span class="pl-s">var</span> content <span class="pl-k">=</span> seqA.fractionalContent();
+<span class="pl-c">/* Looks like:</span>
+<span class="pl-c">  {</span>
+<span class="pl-c">    'A': 1.5,</span>
+<span class="pl-c">    'T': 1.5,</span>
+<span class="pl-c">    'G': 0.5,</span>
+<span class="pl-c">    'C': 0.5</span>
+<span class="pl-c">  }</span>
+<span class="pl-c">*/</span>
+
+<span class="pl-s">var</span> Acontent <span class="pl-k">=</span> content[<span class="pl-s1"><span class="pl-pds">'</span>A<span class="pl-pds">'</span></span>]; <span class="pl-c">// === 1.5</span></pre></div>
+
+<hr>
+
+<h4>
+<a id="ntseqfractionalcontentatgc" class="anchor" href="#ntseqfractionalcontentatgc" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.Seq#fractionalContentATGC()</h4>
+
+<p>returns <code>Object</code></p>
+
+<p>Returns a Object (hash table) containing the fraction of <strong>only the four
+non-degenerate nucleotides</strong>.</p>
+
+<p><strong>NOTE:</strong> Degenerate nucleotides are counted as <em>fractions</em>
+of A, T, G, or C with this method. (N = 0.25 x A, 0.25 x G, 0.25 x T, 0.25 x C).</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> seqA <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>ATNN<span class="pl-pds">'</span></span>);
+
+<span class="pl-s">var</span> content <span class="pl-k">=</span> seqA.fractionalContent();
+<span class="pl-c">/* Looks like:</span>
+<span class="pl-c">  {</span>
+<span class="pl-c">    'A': 0.375,</span>
+<span class="pl-c">    'T': 0.375,</span>
+<span class="pl-c">    'G': 0.125,</span>
+<span class="pl-c">    'C': 0.125</span>
+<span class="pl-c">  }</span>
+<span class="pl-c">*/</span>
+
+<span class="pl-s">var</span> Acontent <span class="pl-k">=</span> content[<span class="pl-s1"><span class="pl-pds">'</span>A<span class="pl-pds">'</span></span>]; <span class="pl-c">// === 0.375</span></pre></div>
+
+<hr>
+
+<h4>
+<a id="ntseqtranslate-optional-integer-offset-optional-integer-length-" class="anchor" href="#ntseqtranslate-optional-integer-offset-optional-integer-length-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.Seq#translate( [optional Integer offset], [optional Integer length] )</h4>
+
+<p>returns <code>String</code></p>
+
+<p>Returns a string containing the Amino Acid sequence represented by the nucleotide
+sequence, starting at a nucleotide provided by <code>offset</code> and continuing for <code>length</code>
+<strong>nucleotides (not amino acids!)</strong>. If <code>offset</code> is not provided, the entire
+sequence will be translated. If <code>length</code> is not provided, translation will
+continue until the end of the sequence.</p>
+
+<p>See <a href="http://en.wikipedia.org/wiki/Amino_acid#Table_of_standard_amino_acid_abbreviations_and_properties">Amino Acid Abbreviations</a> for more details.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> seq <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>ATGCCCGACTGCA<span class="pl-pds">'</span></span>);
+<span class="pl-c">// Translate at nucleotide offset 0</span>
+seq.translate(); <span class="pl-c">// === 'MPDC'</span>
+<span class="pl-c">// Translate at nucleotide offset 1</span>
+seq.translate(<span class="pl-c1">1</span>); <span class="pl-c">// === 'CPTA'</span>
+<span class="pl-c">// Translate at nucleotide offset 1, continue for 6 nucleotides (2 AAs)</span>
+seq.translate(<span class="pl-c1">1</span>, <span class="pl-c1">6</span>); <span class="pl-c">// === 'CP'</span></pre></div>
+
+<hr>
+
+<h4>
+<a id="ntseqtranslateframe-optional-integer-frame-optional-integer-aaoffset-optional-integer-aalength-" class="anchor" href="#ntseqtranslateframe-optional-integer-frame-optional-integer-aaoffset-optional-integer-aalength-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.Seq#translateFrame( [optional Integer frame], [optional Integer AAoffset], [optional Integer AAlength] )</h4>
+
+<p>returns <code>String</code></p>
+
+<p>Returns a string containing the Amino Acid sequence represented by the current
+nucleotide sequence. Translation can begin at one of three <code>frame</code>s (0, 1 or 2)
+and then begin at an Amino Acid specified by <code>AAoffset</code> and continuing for <code>AAlength</code>
+Amino Acids. If <code>AAoffset</code> is not provided, the entire sequence will be translated.
+If <code>AAlength</code> is not provided, translation will continue until the end of the sequence.</p>
+
+<p><strong>NOTE:</strong> Remember the difference! <code>.translateFrame()</code> uses <strong>amino acid</strong> offsets,
+while <code>.translate()</code> uses <strong>nucleotide</strong> offsets.</p>
+
+<p>See <a href="http://en.wikipedia.org/wiki/Amino_acid#Table_of_standard_amino_acid_abbreviations_and_properties">Amino Acid Abbreviations</a> for more details.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> seq <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>ATGCCCGACTGCA<span class="pl-pds">'</span></span>);
+<span class="pl-c">// Translate entire sequence</span>
+seq.translateFrame(); <span class="pl-c">// === 'MPDC'</span>
+<span class="pl-c">// Translate beginning at frame 1 (offset by 1 nt)</span>
+seq.translateFrame(<span class="pl-c1">1</span>); <span class="pl-c">// === 'CPTA'</span>
+<span class="pl-c">// Translate from frame 1 (offset by 1 nt), start by offset of 1 amino acid</span>
+<span class="pl-c">//   and continue for 2 amino acids</span>
+seq.translateFrame(<span class="pl-c1">1</span>, <span class="pl-c1">1</span>, <span class="pl-c1">2</span>); <span class="pl-c">// === 'PT'</span></pre></div>
+
+<hr>
+
+<h4>
+<a id="ntseqmapsequence-ntseq-querysequence-" class="anchor" href="#ntseqmapsequence-ntseq-querysequence-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.Seq#mapSequence( [Nt.Seq querySequence] )</h4>
+
+<p>returns <code>Nt.MatchMap</code></p>
+
+<p>Creates a new <code>Nt.MatchMap</code> object using the provided <code>querySequence</code> as a search
+query in the larger sequence. Equivalent to <code>new MatchMap(querySequence, currentSequence)</code>.</p>
+
+<p>See <strong>Nt.MatchMap</strong> for more details.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> seq <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>ATGCCCGACTGCA<span class="pl-pds">'</span></span>);
+<span class="pl-s">var</span> querySeq <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>TGC<span class="pl-pds">'</span></span>);
+
+<span class="pl-s">var</span> map <span class="pl-k">=</span> seq.mapSequence(querySeq); <span class="pl-c">// === (new Nt.MatchMap(querySeq, seq))</span>
+</pre></div>
+
+<hr>
+
+<h4>
+<a id="ntseqloadfasta-string-pathname-" class="anchor" href="#ntseqloadfasta-string-pathname-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.Seq#loadFASTA( [String pathname] )</h4>
+
+<p>returns <code>self</code></p>
+
+<p><strong>NODE ONLY</strong></p>
+
+<p>Will load sequence data from a FASTA file located at the provided <code>pathname</code></p>
+
+<hr>
+
+<h4>
+<a id="ntseqload4bnt-string-pathname-" class="anchor" href="#ntseqload4bnt-string-pathname-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.Seq#load4bnt( [String pathname] )</h4>
+
+<p>returns <code>self</code></p>
+
+<p><strong>NODE ONLY</strong></p>
+
+<p>Will load sequence data from a <code>.4bnt</code> file located at the provided <code>pathname</code></p>
+
+<p>(<code>.4bnt</code> is short for "4-bit nucleotide")</p>
+
+<hr>
+
+<h4>
+<a id="ntseqsave4bnt-optional-string-name-optional-string-path-" class="anchor" href="#ntseqsave4bnt-optional-string-name-optional-string-path-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.Seq#save4bnt( [optional String name], [optional String path] )</h4>
+
+<p>returns <code>self</code></p>
+
+<p><strong>NODE ONLY</strong></p>
+
+<p>Will save sequence data as <code>name.4bnt</code> in a directory located at <code>path</code>.</p>
+
+<p>If <code>name</code> is not provided, it will be automatically generated as <code>sequence_TIME.4bnt</code>
+where <code>TIME</code> is the current UNIX timestamp in milliseconds.</p>
+
+<p>If <code>path</code> is not provided, the directory you're running the process from will be
+used.</p>
+
+<p>(<code>.4bnt</code> is short for "4-bit nucleotide")</p>
+
+<hr>
+
+<h3>
+<a id="ntmatchmap" class="anchor" href="#ntmatchmap" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.MatchMap</h3>
+
+<h4>
+<a id="constructor-ntmatchmap-ntseq-queryseq-ntseq-searchseq-" class="anchor" href="#constructor-ntmatchmap-ntseq-queryseq-ntseq-searchseq-" aria-hidden="true"><span class="octicon octicon-link"></span></a>(constructor) Nt.Matchmap( [Nt.Seq querySeq], [Nt.Seq searchSeq] )</h4>
+
+<p>Construct a new <code>Nt.MatchMap</code> object that queries <code>searchSeq</code> for matches of
+<code>querySeq</code>. Performs exhaustive degenerate nucleotide matching at every
+combination of nucleotides and stores the results. Results are ordered by alignment
+of position 0 of <code>querySeq</code> with a position in <code>searchSeq</code> (starting with negative offsets).</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> seq <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>ATGCCCGACTGCA<span class="pl-pds">'</span></span>);
+<span class="pl-s">var</span> querySeq <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>TGC<span class="pl-pds">'</span></span>);
+
+<span class="pl-s">var</span> map <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Nt.MatchMap</span>(querySeq, seq); <span class="pl-c">// === seq.mapSequence(querySeq);</span></pre></div>
+
+<hr>
+
+<h4>
+<a id="ntmatchmapresults-optional-integer-offset-optional-integer-count-" class="anchor" href="#ntmatchmapresults-optional-integer-offset-optional-integer-count-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.MatchMap#results( [optional Integer offset], [optional Integer count] )</h4>
+
+<p>returns <code>Array (of Object)</code></p>
+
+<p>Provides results in an array, ordered from the leftmost offset (negative alignment
+  of <code>querySeq</code> relative to <code>searchSeq</code>) as element 0.</p>
+
+<p>Objects returned will be hashes containing the following:</p>
+
+<div class="highlight highlight-javascript"><pre>{
+  position<span class="pl-k">:</span> [Integer],
+  matches<span class="pl-k">:</span> [Integer]
+}</pre></div>
+
+<p>Will <code>Array#slice</code> on the result array depending on <code>offset</code> and <code>count</code>.
+(Returns subset of the Array).</p>
+
+<hr>
+
+<h4>
+<a id="ntmatchmapbest" class="anchor" href="#ntmatchmapbest" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.MatchMap#best()</h4>
+
+<p>returns <code>Nt.MatchResult</code></p>
+
+<p>Provides the best possible alignment match of <code>querySeq</code> in <code>searchSeq</code> as
+a new <code>Nt.MatchResult</code> object. See <strong>Nt.MatchResult</strong> for more details.</p>
+
+<p><strong>NOTE:</strong> There is no guarantee that the sorted results based on matches will be
+stable, do not write code that expects this to always be identical given ties
+of top match counts.</p>
+
+<hr>
+
+<h4>
+<a id="ntmatchmaptop-integer-count-" class="anchor" href="#ntmatchmaptop-integer-count-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.MatchMap#top( [Integer count] )</h4>
+
+<p>returns <code>Array (of Nt.MatchResult)</code></p>
+
+<p>Provides an Array containing the <strong>best</strong> possible alignment matches of <code>querySeq</code>
+in <code>searchSeq</code> as new <code>Nt.MatchResult</code> objects. See <strong>Nt.MatchResult</strong> for more
+details.</p>
+
+<p><strong>NOTE:</strong> There is no guarantee that the sorted results based on matches will be
+stable, do not write code that expects this to always be identical given ties
+of top match counts.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> seq <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>ATGCCCGACTGCA<span class="pl-pds">'</span></span>);
+<span class="pl-s">var</span> querySeq <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>TGC<span class="pl-pds">'</span></span>);
+
+<span class="pl-s">var</span> map <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Nt.MatchMap</span>(querySeq, seq);
+<span class="pl-s">var</span> topArray <span class="pl-k">=</span> map.<span class="pl-sc">top</span>(<span class="pl-c1">2</span>); <span class="pl-c">// === [ Nt.MatchResult, Nt.MatchResult ]</span></pre></div>
+
+<hr>
+
+<h4>
+<a id="ntmatchmapbottom-integer-count-" class="anchor" href="#ntmatchmapbottom-integer-count-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.MatchMap#bottom( [Integer count] )</h4>
+
+<p>returns <code>Array (of Nt.MatchResult)</code></p>
+
+<p>Provides an Array containing the <strong>worst</strong> possible alignment matches of <code>querySeq</code>
+in <code>searchSeq</code> as new <code>Nt.MatchResult</code> objects. See <strong>Nt.MatchResult</strong> for more
+details.</p>
+
+<p><strong>NOTE:</strong> There is no guarantee that the sorted results based on matches will be
+stable, do not write code that expects this to always be identical given ties
+of bottom match counts.</p>
+
+<hr>
+
+<h4>
+<a id="ntmatchmapmatchfrequencydata" class="anchor" href="#ntmatchmapmatchfrequencydata" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.MatchMap#matchFrequencyData()</h4>
+
+<p>returns <code>Array (of Integers)</code></p>
+
+<p>Provides an Array containing the frequency distribution of all matches.
+The Array will be the same length as <code>querySequence.size()</code>, the <em>0</em>-indexed
+element represents the number of times <strong>no (0)</strong> matches were found considering
+all possible alignments,  and the <em>n</em>-indexed element represents the number of
+times <strong>n</strong> matches were found considering all possible alignments.</p>
+
+<hr>
+
+<h3>
+<a id="ntmatchresult" class="anchor" href="#ntmatchresult" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.MatchResult</h3>
+
+<h4>
+<a id="inaccessible-constructor-ntmatchresult" class="anchor" href="#inaccessible-constructor-ntmatchresult" aria-hidden="true"><span class="octicon octicon-link"></span></a>INACCESSIBLE (constructor) Nt.MatchResult</h4>
+
+<p>Create <code>Nt.MatchResult</code> using the <code>Nt.MatchMap#best</code>, <code>Nt.MatchMap#top</code> and
+<code>Nt.MatchMap#bottom</code> methods.</p>
+
+<h4>
+<a id="properties" class="anchor" href="#properties" aria-hidden="true"><span class="octicon octicon-link"></span></a>Properties</h4>
+
+<h5>
+<a id="position" class="anchor" href="#position" aria-hidden="true"><span class="octicon octicon-link"></span></a>.position</h5>
+
+<p>The alignment position of this MatchResult in <code>searchSequence</code> of your
+  <code>Nt.MatchMap</code>.</p>
+
+<h5>
+<a id="matches" class="anchor" href="#matches" aria-hidden="true"><span class="octicon octicon-link"></span></a>.matches</h5>
+
+<p>The number of matches between <code>querySequence</code> and <code>searchSequence</code> at this
+  alignment position.</p>
+
+<hr>
+
+<h4>
+<a id="ntmatchresultalignment" class="anchor" href="#ntmatchresultalignment" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.MatchResult#alignment()</h4>
+
+<p>returns <code>Nt.Seq</code></p>
+
+<p>Creates a new <code>Nt.Seq</code> instance representing the portion of your <code>searchSequence</code>
+aligned at the associated <code>Nt.MatchResult</code> position. Will be <code>querySequence.size()</code>
+nucleotides long.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> seq <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>ATGCCCGACTGCA<span class="pl-pds">'</span></span>);
+<span class="pl-s">var</span> querySeq <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>TGCTC<span class="pl-pds">'</span></span>);
+
+<span class="pl-s">var</span> map <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Nt.MatchMap</span>(querySeq, seq);
+<span class="pl-s">var</span> bestMatch <span class="pl-k">=</span> map.best();
+
+bestMatch.alignment().sequence(); <span class="pl-c">// === 'TGCCC'</span></pre></div>
+
+<hr>
+
+<h4>
+<a id="ntmatchresultalignmentmask" class="anchor" href="#ntmatchresultalignmentmask" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.MatchResult#alignmentMask()</h4>
+
+<p>returns <code>Nt.Seq</code></p>
+
+<p>Creates a new <code>Nt.Seq</code> instance representing a <code>Nt.Seq#mask()</code> of the portion of your <code>searchSequence</code> aligned at the associated <code>Nt.MatchResult</code> position.
+Will be <code>querySequence.size()</code> nucleotides long.</p>
+
+<p>See <strong>Nt.Seq#mask</strong> for more information.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> seq <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>ATGCCCGACTGCA<span class="pl-pds">'</span></span>);
+<span class="pl-s">var</span> querySeq <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>TGCTC<span class="pl-pds">'</span></span>);
+
+<span class="pl-s">var</span> map <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Nt.MatchMap</span>(querySeq, seq);
+<span class="pl-s">var</span> bestMatch <span class="pl-k">=</span> map.best();
+
+bestMatch.alignmentMask().sequence(); <span class="pl-c">// === 'TGC-C'</span></pre></div>
+
+<hr>
+
+<h4>
+<a id="ntmatchresultalignmentcover" class="anchor" href="#ntmatchresultalignmentcover" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nt.MatchResult#alignmentCover()</h4>
+
+<p>returns <code>Nt.Seq</code></p>
+
+<p>Creates a new <code>Nt.Seq</code> instance representing a <code>Nt.Seq#cover()</code> of the portion of your <code>searchSequence</code> aligned at the associated <code>Nt.MatchResult</code> position.
+Will be <code>querySequence.size()</code> nucleotides long.</p>
+
+<p>See <strong>Nt.Seq#cover</strong> for more information.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> seq <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>ATGCCCGACTGCA<span class="pl-pds">'</span></span>);
+<span class="pl-s">var</span> querySeq <span class="pl-k">=</span> (<span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>()).read(<span class="pl-s1"><span class="pl-pds">'</span>TGCTC<span class="pl-pds">'</span></span>);
+
+<span class="pl-s">var</span> map <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Nt.MatchMap</span>(querySeq, seq);
+<span class="pl-s">var</span> bestMatch <span class="pl-k">=</span> map.best();
+
+bestMatch.alignmentCover().sequence(); <span class="pl-c">// === 'TGCYC'</span></pre></div>
+
+<hr>
+
+<h1>
+<a id="appendix" class="anchor" href="#appendix" aria-hidden="true"><span class="octicon octicon-link"></span></a>Appendix</h1>
+
+<h2>
+<a id="background" class="anchor" href="#background" aria-hidden="true"><span class="octicon octicon-link"></span></a>Background</h2>
+
+<p>The initial purpose for developing this library was to find all sequences similar
+to a consensus sequence for a protein's DNA-binding domain in a genome. It was
+hypothesized that this protein could act to inhibit transcription by occluding
+the binding of RNA polymerase in multiple locations. I wanted a tool that could
+generate a list of all of these potential sites of inhibition (sites that the
+protein could potentially bind) ordered by their similarity to a consensus
+sequence.</p>
+
+<p>I had previous experimental results listing a number of nucleotide sequences
+that this DNA-binding domain had high-affinity for. I had to use multiple tools
+to A) generate the consensus from identified binding sequences for this protein,
+B) use BLAST to try and find sequences that matched. Unfortunately, BLAST did
+not support the use the degenerate consensus sequence that I felt would give the
+best and largest set of results (potential binding sites in the genome) to test.</p>
+
+<p>Using <strong>NtSeq</strong>, the <code>Nt.Seq#cover</code> method can generate consensus sequences
+quickly (though the resulting sequence is unweighted), and <code>Nt.MatchMap</code>
+supports degenerate nucleotide matching and can provide <em>all</em> ungapped matches
+(ordered by relevance) of moderately-sized query sequences in the genomic data
+I was looking through (~200kbp) in milliseconds.</p>
+
+<p>This project sat unfinished for years, and I felt the need to clean it up and
+release it. I hope a new generation of young scientists and developers will be
+help develop and permeate small, focused, well-documented open source JavaScript
+libraries to create beautiful online experiences. :)</p>
+
+<h2>
+<a id="the-future-p-values-and-over--under-represented-sequences" class="anchor" href="#the-future-p-values-and-over--under-represented-sequences" aria-hidden="true"><span class="octicon octicon-link"></span></a>The Future, p-Values and Over / Under-Represented Sequences</h2>
+
+<p>Though it is outside of the scope of this project, I have done some work on
+determining whether sequences in a genome are over- or under-represented in a
+genome based on the statistical likelihood of finding a specific frequency of
+<em>k</em> matches given the ATGC content of the genome and search sequence. (i.e.
+How many times would I expect to find sequence identity of 15 (<em>k</em>) of 20
+nucleotides if I aligned my query sequence at every possible location in a
+genome?)</p>
+
+<p><em>Between non-degenerate sequences</em>, you can approximate each alignment check between
+two nucleotides as a <a href="http://en.wikipedia.org/wiki/Bernoulli_trial">Bernoulli trial</a>,
+where your probability of success (a match) is based upon the chance of randomly
+matching a nucleotide from your query sequence with your search sequence (for
+evenly-distributed ATGC content this is 0.25).</p>
+
+<p>You can calculate the probability of matching two nucleotides for your input
+sequences by just calculating a sum of probabilities:</p>
+
+<pre><code>  Pr(match) = (Pr(SeqA, 'A') * Pr(SeqB, 'A')) +
+    (Pr(SeqA, 'T') * Pr(SeqB, 'T')) +
+    (Pr(SeqA, 'G') * Pr(SeqB, 'G')) +
+    (Pr(SeqA, 'C') * Pr(SeqB, 'C'));
+</code></pre>
+
+<p>Where <code>Pr(SeqA, 'A')</code> would be the fractional A content of SeqA. (The
+probability of randomly choosing an 'A' nucleotide in SeqA). (This is available
+from <code>Nt.MatchMap#fractionalContentATGC</code>).</p>
+
+<p>You can then calculate the probability of getting exactly <em>k</em> matches on any
+one alignment (say 15 of 20 for a length-20 query sequence) using the
+Probability Mass Function of a <a href="http://en.wikipedia.org/wiki/Binomial_distribution">Binomial Distribution</a>.</p>
+
+<p>I've written an approximation for calculating the binomial distribution
+probability mass function in JavaScript as follows:</p>
+
+<p><strong>p</strong> is the probability of a match between two randomly selected nucleotides
+  (calculated above).</p>
+
+<p><strong>n</strong> is the number of trials (the length of your query sequence)</p>
+
+<p><strong>k</strong> should be your number of matches.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-st">function</span> <span class="pl-en">binomialPMF</span>(<span class="pl-vpf">p</span>, <span class="pl-vpf">n</span>, <span class="pl-vpf">k</span>) {
+
+  <span class="pl-c">/*</span>
+<span class="pl-c">    k = # of matches</span>
+<span class="pl-c">    n = # of trials (length of query sequence)</span>
+<span class="pl-c">    p = probability of success on a given trial</span>
+<span class="pl-c">  */</span>
+
+  <span class="pl-k">if</span> (p <span class="pl-k">===</span> <span class="pl-c1">0</span>) {
+    <span class="pl-k">return</span> <span class="pl-c1">0</span>;
+  }
+
+  <span class="pl-k">if</span> (p <span class="pl-k">===</span> <span class="pl-c1">1</span>) {
+    <span class="pl-k">return</span> k <span class="pl-k">===</span> n <span class="pl-k">?</span> <span class="pl-c1">1</span> <span class="pl-k">:</span> <span class="pl-c1">0</span>;
+  }
+
+  <span class="pl-c">// use symmetry</span>
+  <span class="pl-k">if</span> (k <span class="pl-k">&gt;</span> (n / <span class="pl-c1">2</span>)) {
+    k <span class="pl-k">=</span> n <span class="pl-k">-</span> k;
+    p <span class="pl-k">=</span> <span class="pl-c1">1</span> <span class="pl-k">-</span> p;
+  };
+
+  <span class="pl-c">/*</span>
+<span class="pl-c">    Binomial PMF:</span>
+<span class="pl-c"></span>
+<span class="pl-c">      (n! / (k! * (n - k)!)) * p^k * (1 - p)^(n - k)</span>
+<span class="pl-c"></span>
+<span class="pl-c">    Take the natural logarithm so we can add floats instead of multiply ints</span>
+<span class="pl-c">    Lose some sensitivity, but if we don't, JS will overflow Number type</span>
+<span class="pl-c"></span>
+<span class="pl-c">      log(n! / (k! * (n - k)!)) + (k * log(p)) + ((n - k) * log(1 - p))</span>
+<span class="pl-c"></span>
+<span class="pl-c">  */</span>
+  <span class="pl-s">var</span> r <span class="pl-k">=</span> logBinomial(n, k) <span class="pl-k">+</span> (k <span class="pl-k">*</span> <span class="pl-s3">Math</span><span class="pl-s3">.log</span>(p)) <span class="pl-k">+</span> ((n <span class="pl-k">-</span> k) <span class="pl-k">*</span> <span class="pl-s3">Math</span><span class="pl-s3">.log</span>(<span class="pl-c1">1</span> <span class="pl-k">-</span> p));
+
+  <span class="pl-k">return</span> <span class="pl-s3">Math</span>.<span class="pl-s3">exp</span>(r);
+
+}
+
+<span class="pl-st">function</span> <span class="pl-en">logBinomial</span>(<span class="pl-vpf">n</span>, <span class="pl-vpf">k</span>) {
+
+  <span class="pl-s">var</span> r <span class="pl-k">=</span> <span class="pl-c1">0</span>;
+  <span class="pl-s">var</span> i;
+
+  <span class="pl-c">/*</span>
+<span class="pl-c"></span>
+<span class="pl-c">    (n! / (k! * (n - k)!)) can be represented as</span>
+<span class="pl-c">    Product (i = (n - k + 1) to n): ( i / (n - i + 1) )</span>
+<span class="pl-c"></span>
+<span class="pl-c">    i.e. n = 5, k = 2</span>
+<span class="pl-c">      5! / (2! * 3!) = (5 * 4) / (2 * 1) = (4/2) * (5/1)</span>
+<span class="pl-c"></span>
+<span class="pl-c">    Can be represented in log form as</span>
+<span class="pl-c">    Sum (i = (n - k + 1) to n): ( log(i) - log(n - i + 1) )</span>
+<span class="pl-c"></span>
+<span class="pl-c">  */</span>
+
+  <span class="pl-k">for</span> (i <span class="pl-k">=</span> n <span class="pl-k">-</span> k <span class="pl-k">+</span> <span class="pl-c1">1</span>; i <span class="pl-k">&lt;=</span> n; i<span class="pl-k">++</span>) {
+    r <span class="pl-k">+=</span> <span class="pl-s3">Math</span><span class="pl-s3">.log</span>(i) <span class="pl-k">-</span> <span class="pl-s3">Math</span><span class="pl-s3">.log</span>(n <span class="pl-k">-</span> i <span class="pl-k">+</span> <span class="pl-c1">1</span>);
+  }
+
+  <span class="pl-k">return</span> r;
+
+};</pre></div>
+
+<p>You can use <code>Nt.MatchMap#matchFrequencyData()</code> to view your match frequencies.
+You can calculate the probability of finding that many matches on a given
+random alignment trial by using <code>binomialPMF(probability_match,
+matchFrequencyData[i], querySeq.size())</code>. (Where i is the number of matches).
+We can then approximate the number of <em>expected</em> frequencies for each match
+amount by multiplying this by <code>searchSeq.size() + querySeq.size()</code> (the number
+of actual trials, <code>Nt.MatchMap</code> uses negative alignment offsets) by your
+probability result from <code>binomialPMF</code>.</p>
+
+<p>I have not included this work in the library at present time, as it represents
+only a preliminary entry into determining the statistical significance of
+sequence match count frequencies. It is nowhere near complete, and if anybody
+can offer additional insight it would be great to extend the library further
+to offer useful p-values to scientists. It is important to note that this
+approach only provides a useful model when mapping and comparing two
+<em>non-degenerate</em> sequences.</p>
+
+<h2>
+<a id="acknowledgements" class="anchor" href="#acknowledgements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Acknowledgements</h2>
+
+<p>Thanks for reading. Hope it's helpful!
+This library is MIT-licensed and completely open source. Use it (and any part
+of it) wherever you'd like, but credit is always appreciated. :)</p>
+
+<p>You can feel free to follow me on Twitter:</p>
+
+<p><a href="http://twitter.com/keithwhor">@keithwhor</a></p>
+
+<p>Check out my other projects on GitHub:</p>
+
+<p><a href="http://github.com/keithwhor">github.com/keithwhor</a></p>
+
+<p>Or check out my personal website:</p>
+
+<p><a href="http://keithwhor.com">keithwhor.com</a></p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/keithwhor/NtSeq/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/keithwhor/NtSeq/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/keithwhor/NtSeq"></a> is maintained by <a href="https://github.com/keithwhor">keithwhor</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
