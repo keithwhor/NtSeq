@@ -1,6 +1,6 @@
 # NtSeq
 
-**NtSeq** is an open source Bionformatics library written in JavaScript
+**NtSeq** is an open source Bioinformatics library written in JavaScript
 that provides DNA sequence manipulation and analysis tools for node and the
 browser.
 
