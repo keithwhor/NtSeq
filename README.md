@@ -831,7 +831,7 @@ nucleotides if I aligned my query sequence at every possible location in a
 genome?)
 
 *Between non-degenerate sequences*, you can approximate each alignment check between
-two nucleotides as a (Bernoulli trial)[http://en.wikipedia.org/wiki/Bernoulli_trial],
+two nucleotides as a [Bernoulli trial](http://en.wikipedia.org/wiki/Bernoulli_trial),
 where your probability of success (a match) is based upon the chance of randomly
 matching a nucleotide from your query sequence with your search sequence (for
 evenly-distributed ATGC content this is 0.25).
@@ -852,7 +852,7 @@ from `Nt.MatchMap#fractionalContentATGC`).
 
 You can then calculate the probability of getting exactly *k* matches on any
 one alignment (say 15 of 20 for a length-20 query sequence) using the
-Probability Mass Function of a (Binomial Distribution)[http://en.wikipedia.org/wiki/Binomial_distribution].
+Probability Mass Function of a [Binomial Distribution](http://en.wikipedia.org/wiki/Binomial_distribution).
 
 I've written an approximation for calculating the binomial distribution
 probability mass function in JavaScript as follows:
@@ -948,11 +948,17 @@ approach only provides a useful model when mapping and comparing two
 
 ## Acknowledgements
 
-Hope it's helpful! This library is MIT-licensed and completely open source.
+Thanks for reading. Hope it's helpful!
+This library is MIT-licensed and completely open source. Use it (and any part
+of it) wherever you'd like, but credit is always appreciated. :)
 
 You can feel free to follow me on Twitter:
 
 [@keithwhor](http://twitter.com/keithwhor)
+
+Check out my other projects on GitHub:
+
+http://github.com/keithwhor
 
 Or check out my personal website:
 
