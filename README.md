@@ -1,16 +1,42 @@
 # NtSeq
 
-Welcome! **NtSeq** is a degenerate Nucleotide sequence manipulation and analysis library for Node and the Browser. It's built with the developer (and scientist) in mind with simple, readable methods that are part of the standard molecular biologist's vocabulary.
+**NtSeq** is a DNA sequence manipulation and analysis library for Node and the Browser.
 
-Additionally, **NtSeq** comes with a novel, highly optimized exhaustive sequence mapping / comparison tool known as **MatchMap** that allows you to *find all ungapped alignments between two degenerate nucleotide sequences, ordered by the number of matches*. Also provided is a list of results showing the number of each match count, which can be useful for determining if certain sequences or variations are over-represented in a target genome. (P-values, unfortunately, are out of the scope of this project.)
+More specifically, it's a library for dealing with all kinds of nucleotide sequences,
+including *degenerate nucleotides*. It's built with the developer (and scientist) in mind with simple, readable methods that are part of the standard molecular biologist's vocabulary.
 
-**MatchMap** uses bit operations to exhaustively scan a search sequence at a rate of up to 10x faster than a standard naive alignment implementation that uses string comparisons. It can run at a rate of up to **approximately 500,000,000 nucleotide comparisons per second** on a 2.4GHz processor.
+Additionally, **NtSeq** comes with a novel, highly optimized exhaustive sequence mapping / comparison tool known as **Nt.MatchMap**.
 
-Tests and benchmarks are included in this repository which can be easily run from the command line using node / npm. :)
+**Nt.MatchMap** allows you to *find all ungapped alignments between two degenerate nucleotide sequences, ordered by the number of matches*. Also provided is a list of results showing the number of each match count, which can be useful for determining if certain sequences or variations are over-represented in a target genome. (P-values, unfortunately, are out of the scope of this project.)
+
+**MatchMap** uses bit operations to exhaustively scan a search sequence at a rate of up to 10x faster than a standard naive alignment implementation that uses string comparisons. It can run at a rate of up to **approximately 500,000,000 nucleotide comparisons per second** single-threaded on a 2.4GHz processor.
+
+An explanation of the algorithm used will be made available shortly. In the meantime, the code
+is open source and MIT-licensed so feel free to figure it out!
+
+Tests and benchmarks are included in this repository which can be easily run from the command line using node / npm. A sample benchmark is also included in this README. :)
 
 New to bioinformatics, or never played with a nucleotide sequence before?
 Check out [Nucleic Acid Notation](http://en.wikipedia.org/wiki/Nucleic_acid_notation)
 to get started.
+
+## What can I do with NtSeq?
+
+- Quickly scan genomic data for target sequences or ungapped relatives using `.mapSequence()`
+
+- Grab the 5' -> 3' complement of a sequence with `.complement()`
+
+- Manipulate sequences easily using `.replicate()`, `.deletion()`, `.insertion()`, `.repeat()` and `.polymerize()`
+
+- Translate your nucleotide sequences in a single line of code using `.translate()` or `.translateFrame()`
+
+- Quickly determine AT% content with `.content()` or `.fractionalContent()`
+
+- Grab *approximate* AT% content for degenerate sequences using `.contentATGC()` or `.fractionalContentATGC()`
+
+- Load FASTA files into memory from your machine (node) with `.loadFASTA()` or from a string if you use an external AJAX request (web) using `.readFASTA()`
+
+- Save large sequences for easy accession in the future using a new filetype, `.4bnt` that will cut your FASTA file sizes in half with `.save4bnt()` and `.load4bnt()` (**node only**)
 
 ## Installation
 
@@ -49,32 +75,6 @@ var map = new Nt.MatchMap(seqA, seqB);
 // Additionally, this line is equivalent to the previous
 var map = seqB.mapSequence(seqA);
 ```
-
-## Why NtSeq?
-
-JavaScript is, at present, the most popular language in the world. This privilege is not without merit. The language is easily accessible, requiring only a text editor and a web browser to dive into. JavaScript is robust and has a giant community, eager to build the next great tools.
-
-It's the mission of NtSeq to encourage scientific web developers and help provide their community community with better libraries for web application development.
-
-Even from a scientific computing standpoint, Google's work on V8 (the JavaScript engine) has been fantastic. The performance benchmark that **NtSeq** has been able to hit have performed identically (if not better) to previous attempts at native implementations of **MatchMap**'s bit operation algorithm.
-
-## What can I do with NtSeq?
-
-- Quickly scan genomic data for target sequences or ungapped relatives using `.mapSequence()`
-
-- Grab the 5' -> 3' complement of a sequence with `.complement()`
-
-- Manipulate sequences easily using `.replicate()`, `.deletion()`, `.insertion()`, `.repeat()` and `.polymerize()`
-
-- Translate your nucleotide sequences in a single line of code using `.translate()` or `.translateFrame()`
-
-- Quickly determine AT% content with `.content()` or `.fractionalContent()`
-
-- Grab *approximate* AT% content for degenerate sequences using `.contentATGC()` or `.fractionalContentATGC()`
-
-- Load FASTA files into memory from your machine (node) with `.loadFASTA()` or from a string if you use an external AJAX request (web) using `.readFASTA()`
-
-- Save large sequences for easy accession in the future using a new filetype, `.4bnt` that will cut your FASTA file sizes in half with `.save4bnt()` and `.load4bnt()` (**node only**)
 
 ## Examples
 
@@ -171,16 +171,64 @@ map.best().alignmentMask().sequence(); // === 'CCC-'
 // this is the optimistic sequence that could match both
 map.best().alignmentCover().sequence(); // === 'CCCD'
 
-// .matchCount provides the number of times a certain number of matches were
+// .matchFrequencyData provides the number of times a certain number of matches were
 //    found. In this example, the sequence didn't find any matches at 6
 //    locations. Keep in mind the sequence attempts to align outside of the
 //    upper and lower bounds of the search space.
 //      i.e.     ATGC
 //             CCCW
-map.matchCount(); // === [ 6, 8, 3, 2, 0 ]
+map.matchFrequencyData(); // === [ 6, 8, 3, 2, 0 ]
 ```
 
-## Library Reference
+## Benchmarks and Tests
+
+NtSeq has a number of integration tests that you can access (after cloning the
+  repository).
+
+Run tests with
+
+```
+$ npm test
+```
+
+And run benchmarks with
+
+```
+$ npm run benchmark
+```
+
+You should get an output that looks (roughly) like the following (taken
+  Feb 7th, 2015 on a 2.4GHz processor).
+
+```
+Benchmark         |        naive |       search |   naiveScore |  searchScore
+--------------------------------------------------------------------------------
+1,000,000, 0%     |          9ms |          3ms |    9.00ns/nt |    3.00ns/nt
+10,000,000, 0%    |         63ms |          5ms |    6.30ns/nt |    0.50ns/nt
+100,000,000, 0%   |        621ms |         60ms |    6.21ns/nt |    0.60ns/nt
+1,000,000, 25%    |         15ms |          6ms |   15.00ns/nt |    6.00ns/nt
+10,000,000, 25%   |        124ms |         17ms |   12.40ns/nt |    1.70ns/nt
+100,000,000, 25%  |       1249ms |        233ms |   12.49ns/nt |    2.33ns/nt
+1,000,000, 50%    |         15ms |          2ms |   15.00ns/nt |    2.00ns/nt
+10,000,000, 50%   |        131ms |         20ms |   13.10ns/nt |    2.00ns/nt
+100,000,000, 50%  |       1305ms |        234ms |   13.05ns/nt |    2.34ns/nt
+1,000,000, 100%   |         14ms |          2ms |   14.00ns/nt |    2.00ns/nt
+10,000,000, 100%  |        144ms |         18ms |   14.40ns/nt |    1.80ns/nt
+100,000,000, 100% |       1471ms |        240ms |   14.71ns/nt |    2.40ns/nt
+```
+
+**naive** refers to a simple string implementation of exhaustive alignment
+mapping (no heuristics), and **search** refers to the **MatchMap** optimized
+bit op alignment mapping, providing the same result (no heuristics either!).
+
+The scores (lower is better) are calculated by dividing the total execution time
+  in nanoseconds by the input size in (*m* x *n* where *m* is search (large)
+  sequence length and *n* is query sequence length).
+
+The benchmark titles indicate the total size of the search space, and what
+percent identity (similarity) the sequences have to one another.
+
+# Library Reference
 
 ### Nt.Seq
 
@@ -646,7 +694,7 @@ of bottom match counts.
 
 ---
 
-#### Nt.MatchMap#matchCount()
+#### Nt.MatchMap#matchFrequencyData()
 
 returns `Array (of Integers)`
 
@@ -742,47 +790,170 @@ bestMatch.alignmentCover().sequence(); // === 'TGCYC'
 
 ---
 
-## Benchmarks and Tests
+# Appendix
 
-NtSeq has a number of integration tests that you can access with
+## Background
+
+The initial purpose for developing this library was to find all sequences similar
+to a consensus sequence for a protein's DNA-binding domain in a genome. It was
+hypothesized that this protein could act to inhibit transcription by occluding
+the binding of RNA polymerase in multiple locations. I wanted a tool that could
+generate a list of all of these potential sites of inhibition (sites that the
+protein could potentially bind) ordered by their similarity to a consensus
+sequence.
+
+I had previous experimental results listing a number of nucleotide sequences
+that this DNA-binding domain had high-affinity for. I had to use multiple tools
+to A) generate the consensus from identified binding sequences for this protein,
+B) use BLAST to try and find sequences that matched. Unfortunately, BLAST did
+not support the use the degenerate consensus sequence that I felt would give the
+best and largest set of results (potential binding sites in the genome) to test.
+
+Using **NtSeq**, the `Nt.Seq#cover` method can generate consensus sequences
+quickly (though the resulting sequence is unweighted), and `Nt.MatchMap`
+supports degenerate nucleotide matching and can provide *all* ungapped matches
+(ordered by relevance) of moderately-sized query sequences in the genomic data
+I was looking through (~200kbp) in milliseconds.
+
+This project sat unfinished for years, and I felt the need to clean it up and
+release it. I hope a new generation of young scientists and developers will be
+help develop and permeate small, focused, well-documented open source JavaScript
+libraries to create beautiful online experiences. :)
+
+## The Future, p-Values and Over / Under-Represented Sequences
+
+Though it is outside of the scope of this project, I have done some work on
+determining whether sequences in a genome are over- or under-represented in a
+genome based on the statistical likelihood of finding a specific frequency of
+*k* matches given the ATGC content of the genome and search sequence. (i.e.
+How many times would I expect to find sequence identity of 15 (*k*) of 20
+nucleotides if I aligned my query sequence at every possible location in a
+genome?)
+
+*Between non-degenerate sequences*, you can approximate each alignment check between
+two nucleotides as a (Bernoulli trial)[http://en.wikipedia.org/wiki/Bernoulli_trial],
+where your probability of success (a match) is based upon the chance of randomly
+matching a nucleotide from your query sequence with your search sequence (for
+evenly-distributed ATGC content this is 0.25).
+
+You can calculate the probability of matching two nucleotides for your input
+sequences by just calculating a sum of probabilities:
 
 ```
-$ npm test
+  Pr(match) = (Pr(SeqA, 'A') * Pr(SeqB, 'A')) +
+    (Pr(SeqA, 'T') * Pr(SeqB, 'T')) +
+    (Pr(SeqA, 'G') * Pr(SeqB, 'G')) +
+    (Pr(SeqA, 'C') * Pr(SeqB, 'C'));
 ```
 
-and run benchmarks with
+Where `Pr(SeqA, 'A')` would be the fractional A content of SeqA. (The
+probability of randomly choosing an 'A' nucleotide in SeqA). (This is available
+from `Nt.MatchMap#fractionalContentATGC`).
 
+You can then calculate the probability of getting exactly *k* matches on any
+one alignment (say 15 of 20 for a length-20 query sequence) using the
+Probability Mass Function of a (Binomial Distribution)[http://en.wikipedia.org/wiki/Binomial_distribution].
+
+I've written an approximation for calculating the binomial distribution
+probability mass function in JavaScript as follows:
+
+**p** is the probability of a match between two randomly selected nucleotides
+  (calculated above).
+**n** is the number of trials (the length of your query sequence)
+**k** should be your number of matches.
+
+```javascript
+function binomialPMF(p, n, k) {
+
+  /*
+    k = # of matches
+    n = # of trials (length of query sequence)
+    p = probability of success on a given trial
+  */
+
+  if (p === 0) {
+    return 0;
+  }
+
+  if (p === 1) {
+    return k === n ? 1 : 0;
+  }
+
+  // use symmetry
+  if (k > (n / 2)) {
+    k = n - k;
+    p = 1 - p;
+  };
+
+  /*
+    Binomial PMF:
+
+      (n! / (k! * (n - k)!)) * p^k * (1 - p)^(n - k)
+
+    Take the natural logarithm so we can add floats instead of multiply ints
+    Lose some sensitivity, but if we don't, JS will overflow Number type
+
+      log(n! / (k! * (n - k)!)) + (k * log(p)) + ((n - k) * log(1 - p))
+
+  */
+  var r = logBinomial(n, k) + (k * Math.log(p)) + ((n - k) * Math.log(1 - p));
+
+  return Math.exp(r);
+
+}
+
+function logBinomial(n, k) {
+
+  var r = 0;
+  var i;
+
+  /*
+
+    (n! / (k! * (n - k)!)) can be represented as
+    Product (i = (n - k + 1) to n): ( i / (n - i + 1) )
+
+    i.e. n = 5, k = 2
+      5! / (2! * 3!) = (5 * 4) / (2 * 1) = (4/2) * (5/1)
+
+    Can be represented in log form as
+    Sum (i = (n - k + 1) to n): ( log(i) - log(n - i + 1) )
+
+  */
+
+  for (i = n - k + 1; i <= n; i++) {
+    r += Math.log(i) - Math.log(n - i + 1);
+  }
+
+  return r;
+
+};
 ```
-$ npm run benchmark
-```
 
-You should get an output that looks (roughly) like the following (taken
-  Feb 7th, 2015 on a 2.4GHz processor).
+You can use `Nt.MatchMap#matchFrequencyData()` to view your match frequencies.
+You can calculate the probability of finding that many matches on a given
+random alignment trial by using `binomialPMF(probability_match,
+matchFrequencyData[i], querySeq.size())`. (Where i is the number of matches).
+We can then approximate the number of *expected* frequencies for each match
+amount by multiplying this by `searchSeq.size() + querySeq.size()` (the number
+of actual trials, `Nt.MatchMap` uses negative alignment offsets) by your
+probability result from `binomialPMF`.
 
-**naive** refers to a simple string implementation of exhaustive alignment
-mapping (no heuristics), and **search** refers to the **MatchMap** optimized
-bit up alignment mapping, providing the same result (no heuristics either!).
+I have not included this work in the library at present time, as it represents
+only a preliminary entry into determining the statistical significance of
+sequence match count frequencies. It is nowhere near complete, and if anybody
+can offer additional insight it would be great to extend the library further
+to offer useful p-values to scientists. It is important to note that this
+approach only provides a useful model when mapping and comparing two
+*non-degenerate* sequences.
 
-The scores (lower is better) are calculated by dividing the total execution time
-  in nanoseconds by the input size in (*m* x *n* where *m* is search (large)
-  sequence length and *n* is query sequence length).
+## Acknowledgements
 
-The benchmark titles indicate the total size of the search space, and what
-percent identity (similarity) the sequences have to one another.
+Hope it's helpful! This library is MIT-licensed and completely open source.
 
-```
-Benchmark         |        naive |       search |   naiveScore |  searchScore
---------------------------------------------------------------------------------
-1,000,000, 0%     |          9ms |          3ms |    9.00ns/nt |    3.00ns/nt
-10,000,000, 0%    |         63ms |          5ms |    6.30ns/nt |    0.50ns/nt
-100,000,000, 0%   |        621ms |         60ms |    6.21ns/nt |    0.60ns/nt
-1,000,000, 25%    |         15ms |          6ms |   15.00ns/nt |    6.00ns/nt
-10,000,000, 25%   |        124ms |         17ms |   12.40ns/nt |    1.70ns/nt
-100,000,000, 25%  |       1249ms |        233ms |   12.49ns/nt |    2.33ns/nt
-1,000,000, 50%    |         15ms |          2ms |   15.00ns/nt |    2.00ns/nt
-10,000,000, 50%   |        131ms |         20ms |   13.10ns/nt |    2.00ns/nt
-100,000,000, 50%  |       1305ms |        234ms |   13.05ns/nt |    2.34ns/nt
-1,000,000, 100%   |         14ms |          2ms |   14.00ns/nt |    2.00ns/nt
-10,000,000, 100%  |        144ms |         18ms |   14.40ns/nt |    1.80ns/nt
-100,000,000, 100% |       1471ms |        240ms |   14.71ns/nt |    2.40ns/nt
-```
+You can feel free to follow me on Twitter:
+
+[@keithwhor](http://twitter.com/keithwhor)
+
+Or check out my personal website:
+
+http://keithwhor.com

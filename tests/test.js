@@ -481,10 +481,10 @@ test.add(function() {
   ];
 
   var isCorrect = true;
-  var matchCount = matchMap.matchCount();
+  var matchFrequencyData = matchMap.matchFrequencyData();
 
-  for (var i = 0; i < matchCount.length; i++) {
-    if (matchCount[i] !== testData[i]) {
+  for (var i = 0; i < matchFrequencyData.length; i++) {
+    if (matchFrequencyData[i] !== testData[i]) {
       isCorrect = false;
       break;
     }
@@ -531,10 +531,10 @@ test.add(function() {
   ];
 
   var isCorrect = true;
-  var matchCount = matchMap.matchCount();
+  var matchFrequencyData = matchMap.matchFrequencyData();
 
-  for (var i = 0; i < matchCount.length; i++) {
-    if (matchCount[i] !== testData[i]) {
+  for (var i = 0; i < matchFrequencyData.length; i++) {
+    if (matchFrequencyData[i] !== testData[i]) {
       isCorrect = false;
       break;
     }
