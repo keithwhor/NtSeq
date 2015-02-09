@@ -462,7 +462,7 @@ of A, T, G, or C with this method. (N = 0.25 x A, 0.25 x G, 0.25 x T, 0.25 x C).
 ```javascript
 var seqA = (new Nt.Seq()).read('ATNN');
 
-var content = seqA.fractionalContent();
+var content = seqA.contentATGC();
 /* Looks like:
   {
     'A': 1.5,
@@ -490,7 +490,7 @@ of A, T, G, or C with this method. (N = 0.25 x A, 0.25 x G, 0.25 x T, 0.25 x C).
 ```javascript
 var seqA = (new Nt.Seq()).read('ATNN');
 
-var content = seqA.fractionalContent();
+var content = seqA.fractionalContentATGC();
 /* Looks like:
   {
     'A': 0.375,
