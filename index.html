@@ -76,6 +76,9 @@ to get started.</p>
 <h2>
 <a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
 
+<h3>
+<a id="node" class="anchor" href="#node" aria-hidden="true"><span class="octicon octicon-link"></span></a>Node</h3>
+
 <p><strong>NtSeq</strong> is available as a node package, and can be installed with:</p>
 
 <pre><code>$ npm install ntseq
@@ -86,13 +89,25 @@ to get started.</p>
 <div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> Nt <span class="pl-k">=</span> <span class="pl-s3">require</span>(<span class="pl-s1"><span class="pl-pds">'</span>ntseq<span class="pl-pds">'</span></span>);</pre></div>
 
 <p>(The <a href="https://www.npmjs.com/package/ntseq">node.js version</a> has some useful
-additional tools.)</p>
+additional tools as compared to the web version.)</p>
 
-<p>In order to use NtSeq on a webpage, download <code>ntseq.js</code> from this repository and include it in a script tag, like so (assuming it is in the same directory as your page):</p>
+<h3>
+<a id="web" class="anchor" href="#web" aria-hidden="true"><span class="octicon octicon-link"></span></a>Web</h3>
+
+<p>In order to use NtSeq on a webpage, download <code>ntseq.js</code> from the <code>web</code> folder of
+this repository and include it in a script tag, like so (assuming it is in the
+same directory as your page):</p>
 
 <div class="highlight highlight-javascript"><pre><span class="pl-k">&lt;</span>script src<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>ntseq.js<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>/script<span class="pl-k">&gt;</span></pre></div>
 
-<p>The <code>Nt</code> namespace contains two constructor methods, <code>Nt.Seq</code> and <code>Nt.MatchMap</code>. You can use these by calling:</p>
+<p>If you're new to writing web applications, a sample page that uses NtSeq is
+available as <code>index.html</code> (in the <code>web</code> directory).</p>
+
+<h3>
+<a id="quick-usage" class="anchor" href="#quick-usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quick Usage</h3>
+
+<p>The <code>Nt</code> namespace contains two constructor methods, <code>Nt.Seq</code> and <code>Nt.MatchMap</code>.
+You can use these by calling:</p>
 
 <div class="highlight highlight-javascript"><pre><span class="pl-c">// Create and put data into a new nucleotide sequence</span>
 <span class="pl-s">var</span> seqA <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Nt.Seq</span>();
