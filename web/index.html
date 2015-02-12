@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sample NtSeq Project</title>
+    <script src="ntseq.js"></script>
+    <style>
+
+      body {
+
+        padding: 10px;
+        margin: 0;
+        background-color: #333;
+        color: #fff;
+        font-size: 12px;
+        font-family: 'Monaco', 'Courier New', 'Courier';
+
+      }
+
+      #output {
+
+        white-space: pre-line;
+
+      }
+
+    </style>
+  </head>
+  <body>
+    <textarea id="input" rows="6" cols="50">ATGCCTGAAAGC</textarea><br>
+    FASTA Mode? <input type="checkbox" id="fasta"></checkbox><br>
+    ===<br>
+    <div id="output"></div>
+  </body>
+  <script>
+
+    // Create a basic print function
+    function print(str) {
+
+      var el = document.getElementById('output');
+      el.innerHTML += str + '\n';
+
+    };
+
+    function clear() {
+
+      var el = document.getElementById('output');
+      el.innerHTML = '';
+
+    };
+
+    // Create a function that will be executed first
+    function main() {
+
+      var seqA = new Nt.Seq();
+
+      if (document.getElementById('fasta').checked) {
+
+        seqA.readFASTA(document.getElementById('input').value);
+
+      } else {
+
+        seqA.read(document.getElementById('input').value);
+
+      }
+
+      clear();
+
+      print('Sequence:');
+      print(seqA.sequence());
+
+      print('\nRepeated:');
+      print(seqA.repeat(2).sequence());
+
+      print('\nComplement:');
+      print(seqA.complement().sequence());
+
+      print('\nTranslated:');
+      print(seqA.translate());
+
+    };
+
+    // Append an event listener to fire main() when the document is loaded
+    window.addEventListener('DOMContentLoaded', main);
+
+    // Append an event listener to fire main() when keyup event is fired
+    document.getElementById('input').addEventListener('keyup', main);
+
+    // Append an event to fire main() when fasta mode is changed
+    document.getElementById('fasta').addEventListener('change', main);
+
+  </script>
+</html>
