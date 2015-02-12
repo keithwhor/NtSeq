@@ -47,6 +47,8 @@ to get started.
 
 ## Installation
 
+### Node
+
 **NtSeq** is available as a node package, and can be installed with:
 
 ```
@@ -60,15 +62,25 @@ var Nt = require('ntseq');
 ```
 
 (The [node.js version](https://www.npmjs.com/package/ntseq) has some useful
-additional tools.)
+additional tools as compared to the web version.)
 
-In order to use NtSeq on a webpage, download `ntseq.js` from this repository and include it in a script tag, like so (assuming it is in the same directory as your page):
+### Web
+
+In order to use NtSeq on a webpage, download `ntseq.js` from the `web` folder of
+this repository and include it in a script tag, like so (assuming it is in the
+same directory as your page):
 
 ```javascript
 <script src="ntseq.js"></script>
 ```
 
-The `Nt` namespace contains two constructor methods, `Nt.Seq` and `Nt.MatchMap`. You can use these by calling:
+If you're new to writing web applications, a sample page that uses NtSeq is
+available as `index.html` (in the `web` directory).
+
+### Quick Usage
+
+The `Nt` namespace contains two constructor methods, `Nt.Seq` and `Nt.MatchMap`.
+You can use these by calling:
 
 ```javascript
 // Create and put data into a new nucleotide sequence
