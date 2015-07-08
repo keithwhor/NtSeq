@@ -125,6 +125,14 @@ test.add(function() {
 
 test.add(function() {
 
+  var a = new Nt.Seq().read('tgcgctacgaagacgt');
+
+  return a.replicate(0, 7).sequence() === 'TGCGCTA';
+
+}, 'Replication works with (0, 7) for length 16 sequence');
+
+test.add(function() {
+
   var a = new Nt.Seq().read('ATGCATGCA');
 
   return a.replicate(7, 2).sequence() === 'CA';
