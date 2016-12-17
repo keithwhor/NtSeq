@@ -1022,7 +1022,18 @@ var Nt = function() {
 
     if (!this.__align) {
       var map = this.__matchMap;
-      this.__align = map.__searchSpace.replicate(this.position, map.__query.__length);
+      if (this.position < 0) {
+        this.__align = (new Nt.Seq())
+          .read('-')
+          .repeat(-this.position)
+          .polymerize(map.__searchSpace.replicate(0, map.__query.__length + this.position));
+      } else if (this.position + map.__query.__length > map.__searchSpace.__length) {
+        this.__align = map.__searchSpace
+          .replicate(this.position)
+          .polymerize((new Nt.Seq()).read('-').repeat(map.__searchSpace.__length - this.position));
+      } else {
+        this.__align = map.__searchSpace.replicate(this.position, map.__query.__length);
+      }
     }
     return this.__align;
 
@@ -1080,9 +1091,11 @@ var Nt = function() {
     this.__debug.searchTime = (-t) + (t = (new Date).valueOf());
 
     var queryLen = this.__query.size();
+    var searchLen = this.__searchSpace.size();
     var adjust = queryLen - 1;
-
-    var results = [].slice.call(dataArray, ((8 - (queryLen % 8)) % 8) + 1);
+    var resultsLen = ((8 - (queryLen % 8)) % 8) + 1;
+    var totalLen = searchLen + queryLen - 1;
+    var results = [].slice.call(dataArray, resultsLen, resultsLen + totalLen);
 
     var temp;
 

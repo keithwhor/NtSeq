@@ -125,6 +125,22 @@ test.add(function() {
 
 test.add(function() {
 
+  var a = new Nt.Seq().read('TGCGCTACGAAGACGT');
+
+  return a.replicate(0, 7).sequence() === 'TGCGCTA';
+
+}, 'Replication works with (0, 7) for length 16 sequence');
+
+test.add(function() {
+
+  var a = new Nt.Seq().read('TGCGCTACGAAGACGT');
+
+  return a.replicate(1, 8).sequence() === 'GCGCTACG';
+
+}, 'Replication works with (1, 8) for length 16 sequence');
+
+test.add(function() {
+
   var a = new Nt.Seq().read('ATGCATGCA');
 
   return a.replicate(7, 2).sequence() === 'CA';
@@ -457,7 +473,7 @@ test.add(function() {
   var matchMap = a.mapSequence(b);
 
   var testData = [
-    234,
+    233,
     1571,
     5942,
     14035,
@@ -507,7 +523,7 @@ test.add(function() {
   var matchMap = a.mapSequence(b);
 
   var testData = [
-    234,
+    233,
     1571,
     5942,
     14035,
