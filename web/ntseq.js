@@ -703,8 +703,6 @@ var Nt = function() {
 
   Seq.prototype.__slice = function(start, length) {
 
-    console.log('SLICE?', start, length);
-
     var max = length >>> 1;
     var odd = length & 1;
 
