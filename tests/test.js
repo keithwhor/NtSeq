@@ -470,7 +470,7 @@ test.add(function() {
   // Sequence target in Bacteriophage T4, gene 46
   // [33302..34984]
 
-  var matchMap = a.mapSequence(b);
+  var matchMap = a.mapSequence(b).initialize();
 
   var testData = [
     233,
@@ -520,7 +520,7 @@ test.add(function() {
   // Sequence target in Bacteriophage T4, gene 46
   // [33302..34984]
 
-  var matchMap = a.mapSequence(b);
+  var matchMap = a.mapSequence(b).initialize();
 
   var testData = [
     233,

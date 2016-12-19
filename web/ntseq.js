@@ -703,6 +703,8 @@ var Nt = function() {
 
   Seq.prototype.__slice = function(start, length) {
 
+    console.log('SLICE?', start, length);
+
     var max = length >>> 1;
     var odd = length & 1;
 
@@ -710,7 +712,7 @@ var Nt = function() {
     var newBuffer = new ArrayBuffer(max + odd + endPadding + 4);
     var newArray = new Uint32Array(newBuffer, 4);
 
-    var subBuffer = this.__buffer.slice(4 + (start >>> 1), 4 + (start >>> 1) + Math.ceil(length * 2));
+    var subBuffer = this.__buffer.slice(4 + (start >>> 1), 4 + (start >>> 1) + newBuffer.byteLength);
     var subInt32Length = subBuffer.byteLength >>> 2;
     var subArray = new Uint32Array(subBuffer, 0, subInt32Length);
 
@@ -1123,7 +1125,7 @@ var Nt = function() {
   MatchMap.prototype.sort = function() {
 
     if (!this.__initialized) {
-      throw new Error('MatchMap must be executed first.');
+      throw new Error('MatchMap must be initialized first.');
     }
 
     var t = new Date().valueOf();
@@ -1158,7 +1160,7 @@ var Nt = function() {
   MatchMap.prototype.results = function(offset, count) {
 
     if (!this.__initialized) {
-      throw new Error('MatchMap must be executed first.');
+      throw new Error('MatchMap must be initialized first.');
     }
 
     if (offset === undefined) {
@@ -1176,7 +1178,7 @@ var Nt = function() {
   MatchMap.prototype.best = function() {
 
     if (!this.__initialized) {
-      throw new Error('MatchMap must be executed first.');
+      throw new Error('MatchMap must be initialized first.');
     }
 
     var result = this.__orderedResults[0];
@@ -1187,7 +1189,7 @@ var Nt = function() {
   MatchMap.prototype.top = function(n) {
 
     if (!this.__initialized) {
-      throw new Error('MatchMap must be executed first.');
+      throw new Error('MatchMap must be initialized first.');
     }
 
     var self = this;
@@ -1201,7 +1203,7 @@ var Nt = function() {
   MatchMap.prototype.bottom = function(n) {
 
     if (!this.__initialized) {
-      throw new Error('MatchMap must be executed first.');
+      throw new Error('MatchMap must be initialized first.');
     }
 
     var self = this;
@@ -1217,7 +1219,7 @@ var Nt = function() {
   MatchMap.prototype.matchFrequencyData = function() {
 
     if (!this.__initialized) {
-      throw new Error('MatchMap must be executed first.');
+      throw new Error('MatchMap must be initialized first.');
     }
 
     if (this.__matchFrequencyData) {
