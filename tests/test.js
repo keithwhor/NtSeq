@@ -470,7 +470,7 @@ test.add(function() {
   // Sequence target in Bacteriophage T4, gene 46
   // [33302..34984]
 
-  var matchMap = a.mapSequence(b).initialize();
+  var matchMap = a.mapSequence(b).initialize().sort();
 
   var testData = [
     233,
@@ -508,7 +508,7 @@ test.add(function() {
 
   return isCorrect &&
     matchMap.best().position === 34767 &&
-    matchMap.best().matches === 20;
+    matchMap.best().score === 20;
 
 }, 'mapSequence successfully found correct match scores, loaded from .fasta');
 
@@ -520,7 +520,7 @@ test.add(function() {
   // Sequence target in Bacteriophage T4, gene 46
   // [33302..34984]
 
-  var matchMap = a.mapSequence(b).initialize();
+  var matchMap = a.mapSequence(b).initialize().sort();
 
   var testData = [
     233,
@@ -558,7 +558,7 @@ test.add(function() {
 
   return isCorrect &&
     matchMap.best().position === 34767 &&
-    matchMap.best().matches === 20;
+    matchMap.best().score === 20;
 
 }, 'mapSequence successfully found correct match scores, loaded from .4bnt');
 
