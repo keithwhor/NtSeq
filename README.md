@@ -630,7 +630,7 @@ used.
 
 ### Nt.MatchMap
 
-#### (constructor) Nt.Matchmap( [Nt.Seq querySeq], [Nt.Seq searchSeq] )
+#### (constructor) Nt.MatchMap( [Nt.Seq querySeq], [Nt.Seq searchSeq] )
 
 Construct a new `Nt.MatchMap` object that queries `searchSeq` for matches of
 `querySeq`. Performs exhaustive degenerate nucleotide matching at every
@@ -642,6 +642,18 @@ var seq = (new Nt.Seq()).read('ATGCCCGACTGCA');
 var querySeq = (new Nt.Seq()).read('TGC');
 
 var map = new Nt.MatchMap(querySeq, seq); // === seq.mapSequence(querySeq);
+```
+
+#### Nt.MatchMap#initialize()
+
+Initialises the `MatchMap` so you can query the results.
+
+```javascript
+var seq = (new Nt.Seq()).read('ATGCCCGACTGCA');
+var querySeq = (new Nt.Seq()).read('TGC');
+
+var map = new Nt.MatchMap(querySeq, seq);
+var initializedMap = map.initialize();
 ```
 
 ---
@@ -696,7 +708,7 @@ of top match counts.
 var seq = (new Nt.Seq()).read('ATGCCCGACTGCA');
 var querySeq = (new Nt.Seq()).read('TGC');
 
-var map = new Nt.MatchMap(querySeq, seq);
+var map = new Nt.MatchMap(querySeq, seq).initialize();
 var topArray = map.top(2); // === [ Nt.MatchResult, Nt.MatchResult ]
 ```
 
