@@ -164,7 +164,7 @@ Hmm, well this is a small sequence but I want to find where "CCCG" matches
 ```javascript
 var seq = (new Nt.Seq()).read('ATGCCCGACTGCA');
 var querySeq = (new Nt.Seq()).read('CCCG');
-var map = seq.mapSequence(querySeq);
+var map = seq.mapSequence(querySeq).initialize().sort();
 map.best().position; // === 3
 ```
 
@@ -173,7 +173,7 @@ What about degenerate matching, 'ASTG'?
 ```javascript
 var seq = (new Nt.Seq()).read('ATGCCCGACTGCA');
 var querySeq = (new Nt.Seq()).read('ASTG');
-var map = seq.mapSequence(querySeq);
+var map = seq.mapSequence(querySeq).initialize().sort();
 map.best().position; // === 7
 ```
 
@@ -182,7 +182,7 @@ What if there are no perfect matches?
 ```javascript
 var seq = (new Nt.Seq()).read('ATGCCCGACTGCA');
 var querySeq = (new Nt.Seq()).read('CCCW');
-var map = seq.mapSequence(querySeq);
+var map = seq.mapSequence(querySeq).initialize().sort();
 map.best().position; // === 3
 map.best().matches; // === 3
 map.best().alignment().sequence(); // === 'CCCG'
@@ -664,6 +664,22 @@ Objects returned will be hashes containing the following:
 
 Will `Array#slice` on the result array depending on `offset` and `count`.
 (Returns subset of the Array).
+
+---
+
+#### Nt.MatchMap#sort()
+
+Sorts the results of `MatchMap` so you can return `top`, `best` and `bottom` MatchResults.
+
+```javascript
+var seq = (new Nt.Seq()).read('ATGCCCGACTGCA');
+var querySeq = (new Nt.Seq()).read('TGC');
+
+var map = new Nt.MatchMap(querySeq, seq).initialize().sort(); // === seq.mapSequence(querySeq);
+map.best();
+map.top();
+map.bottom();
+```
 
 ---
 
